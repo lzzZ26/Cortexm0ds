@@ -1,0 +1,143 @@
+vvp -n run.out
+VCD info: dumpfile ../../../../../../Download/wave1.vcd opened for output.
+  152490 ns UART:  
+  222870 ns UART: Cortex Microcontroller System Design Kit - UART Test - $Revision: 243483 $ 
+  231610 ns UART:  
+  267190 ns UART: - check initial values 
+  309990 ns UART: - check initial values 
+  334670 ns UART:  
+  376090 ns UART: UART 0 for transmit, UART 1 for receive 
+  384830 ns UART:  
+  414830 ns UART: Simple test 
+  498050 ns UART: - Hello world 
+  525410 ns UART: Data transfer test 
+  534150 ns UART:  
+1083270 ns UART: - bauddiv = 63 done 
+1640470 ns UART: - bauddiv = 64 done 
+1990870 ns UART: - bauddiv = 35 done 
+2362510 ns UART: - bauddiv = 38 done 
+2749070 ns UART: - bauddiv = 40 done 
+3178590 ns UART: - bauddiv = 46 done 
+3885870 ns UART: - bauddiv = 85 done 
+4336630 ns UART: - bauddiv = 49 done 
+4801790 ns UART: - bauddiv = 51 done 
+5166350 ns UART: - bauddiv = 37 done 
+5199650 ns UART: UART enable test 
+5237370 ns UART: - both TX and RX are enabled 
+5289330 ns UART: - TX disabled 
+5362450 ns UART: - RX disabled 
+5440590 ns UART: UART TX & RX IRQ test 
+5471730 ns UART: - TX irq enable 
+5525610 ns UART: - TX irq disable 
+5579970 ns UART: - RX irq enable 
+5633550 ns UART: - RX irq disable 
+5695030 ns UART: UART TX & RX overflow test 
+5728250 ns UART: - TX without overflow 
+5773070 ns UART: - TX with overflow 
+5818930 ns UART: - RX overflow 
+5852870 ns UART:  
+5894290 ns UART: UART 1 for transmit, UART 0 for receive 
+5903030 ns UART:  
+5933030 ns UART: Simple test 
+5978450 ns UART: - Hello world 
+6005850 ns UART: UART enable test 
+6043570 ns UART: - both TX and RX are enabled 
+6095530 ns UART: - TX disabled 
+6168650 ns UART: - RX disabled 
+6246890 ns UART: UART TX & RX IRQ test 
+6277990 ns UART: - TX irq enable 
+6331930 ns UART: - TX irq disable 
+6386290 ns UART: - RX irq enable 
+6440030 ns UART: - RX irq disable 
+6501510 ns UART: UART TX & RX overflow test 
+6534730 ns UART: - TX without overflow 
+6579550 ns UART: - TX with overflow 
+6625510 ns UART: - RX overflow 
+6659150 ns UART:  
+6696930 ns UART: UART 2 interrupt connectivity test 
+6705670 ns UART:  
+6747910 ns UART: UART 2 interrupt connectivity test 
+6778530 ns UART: - UART 2 TX IRQ 
+6796650 ns UART: . 
+6829070 ns UART: - UART 2 TX overflow IRQ 
+6847090 ns UART: .. 
+6871630 ns UART: - UART 2 RX IRQ 
+6911410 ns UART:  
+6943830 ns UART: - UART 2 RX overflow IRQ 
+7006730 ns UART:  
+7033550 ns UART: ** TEST PASSED ** 
+7037370 ns UART: Test Ended
+./tb/cmsdk_uart_capture.v:208: $stop called at 7037370000 (1ps)
+
+
+
+vvp -n run.out
+VCD info: dumpfile ../../../../../../Download/wave2.vcd opened for output.
+  260870 ns UART:  
+  372150 ns UART: Cortex Microcontroller System Design Kit - UART Test - $Revision: 243483 $ 
+  386490 ns UART:  
+  443250 ns UART: - check initial values 
+  510050 ns UART: - check initial values 
+  548590 ns UART:  
+  614350 ns UART: UART 0 for transmit, UART 1 for receive 
+  628690 ns UART:  
+  677370 ns UART: Simple test 
+  764590 ns UART: - Hello world 
+  808310 ns UART: Data transfer test 
+  822650 ns UART:  
+1432650 ns UART: - bauddiv = 63 done 
+2051230 ns UART: - bauddiv = 64 done 
+2463010 ns UART: - bauddiv = 35 done 
+2895910 ns UART: - bauddiv = 38 done 
+3344450 ns UART: - bauddiv = 40 done 
+3835410 ns UART: - bauddiv = 46 done 
+4605030 ns UART: - bauddiv = 85 done 
+5117290 ns UART: - bauddiv = 49 done 
+5644050 ns UART: - bauddiv = 51 done 
+6069970 ns UART: - bauddiv = 37 done 
+6123130 ns UART: UART enable test 
+6182870 ns UART: - both TX and RX are enabled 
+6265070 ns UART: - TX disabled 
+6380210 ns UART: - RX disabled 
+6502830 ns UART: UART TX & RX IRQ test 
+6553030 ns UART: - TX irq enable 
+6638070 ns UART: - TX irq disable 
+6724270 ns UART: - RX irq enable 
+6808990 ns UART: - RX irq disable 
+6905710 ns UART: UART TX & RX overflow test 
+6958610 ns UART: - TX without overflow 
+7022670 ns UART: - TX with overflow 
+7088650 ns UART: - RX overflow 
+7135510 ns UART:  
+7201270 ns UART: UART 1 for transmit, UART 0 for receive 
+7215610 ns UART:  
+7264290 ns UART: Simple test 
+7313130 ns UART: - Hello world 
+7356830 ns UART: UART enable test 
+7416570 ns UART: - both TX and RX are enabled 
+7498770 ns UART: - TX disabled 
+7613910 ns UART: - RX disabled 
+7736710 ns UART: UART TX & RX IRQ test 
+7786830 ns UART: - TX irq enable 
+7871990 ns UART: - TX irq disable 
+7958190 ns UART: - RX irq enable 
+8043030 ns UART: - RX irq disable 
+8139770 ns UART: UART TX & RX overflow test 
+8192670 ns UART: - TX without overflow 
+8256730 ns UART: - TX with overflow 
+8322850 ns UART: - RX overflow 
+8369450 ns UART:  
+8429530 ns UART: UART 2 interrupt connectivity test 
+8443870 ns UART:  
+8510870 ns UART: UART 2 interrupt connectivity test 
+8560330 ns UART: - UART 2 TX IRQ 
+8589910 ns UART: . 
+8641730 ns UART: - UART 2 TX overflow IRQ 
+8671010 ns UART: .. 
+8710410 ns UART: - UART 2 RX IRQ 
+8773690 ns UART:  
+8825510 ns UART: - UART 2 RX overflow IRQ 
+8924650 ns UART:  
+8967690 ns UART: ** TEST PASSED ** 
+8973990 ns UART: Test Ended
+./tb/cmsdk_uart_capture.v:208: $stop called at 8973990000 (1ps)

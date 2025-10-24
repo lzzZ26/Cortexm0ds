@@ -1,0 +1,121 @@
+[*]
+[*] GTKWave Analyzer v3.3.100 (w)1999-2019 BSI
+[*] Thu Jul 10 01:30:04 2025
+[*]
+[dumpfile] "D:\Download\wave2.vcd"
+[dumpfile_mtime] "Thu Jul 10 01:27:40 2025"
+[dumpfile_size] 2379943770
+[savefile] "D:\Workshop\CloudSync\ChipDesign\Learning\Cortex-AXI\Cortexm0ds-AXI4\signal.gtkw"
+[timestart] 0
+[size] 1920 1009
+[pos] -9 -9
+*-17.236300 330000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] tb_cmsdk_mcu.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi_default_slave.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi_ram.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi_ram.genblk2.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi_ram.genblk2.u_axi_ram_beh.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi_rom.genblk2.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi_rom.genblk2.u_axi_ram_beh.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.u_ahb2axi4_if.
+[treeopen] tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.u_ahb2axi4_if.u_ahb2axi4_axi.
+[sst_width] 239
+[signals_width] 210
+[sst_expanded] 1
+[sst_vpaned_height] 362
+@28
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.ACLK
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.ARESETn
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.HSIZE[2:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.HBURST[2:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.HWRITE
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.HTRANS[1:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.HREADY
+@22
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.HADDR[31:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.HWDATA[31:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.HRDATA[31:0]
+@28
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.HRESP
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.u_ahb2axi4_if.u_ahb2axi4_ahb.w_dataREQ
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.u_ahb2axi4_if.u_ahb2axi4_ahb.r_dataREQ
+@22
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.u_ahb2axi4_if.u_ahb2axi4_ahb.sta_next[1:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_cortexm0integration.u_cortexm0.u_ahb2axi4_if.u_ahb2axi4_ahb.sta_cur[1:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi_rom.genblk2.u_axi_ram_beh.RF_RSTB[3:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi_ram.genblk2.u_axi_ram_beh.RF_WSTB[3:0]
+@20000
+-
+@28
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.AW_SEL
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.AW_VALID
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.AW_READY
+@22
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.AW_ADDR[15:0]
+@28
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.AW_SIZE[2:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.W_VALID
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.W_READY
+@22
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.W_DATA[31:0]
+@28
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.W_LAST
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.B_VALID
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.B_READY
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.B_RESP[1:0]
+@20000
+-
+@28
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.AR_SEL
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.AR_VALID
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.AR_READY
+@22
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.AR_ADDR[15:0]
+@28
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.AR_SIZE[2:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.R_VALID
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.R_READY
+@22
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.R_DATA[31:0]
+@28
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.R_LAST
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_axi.R_RESP[1:0]
+@22
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.st_next[2:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.st_cur[2:0]
+@20000
+-
+@28
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.PCLK
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.PWRITE
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.PSEL
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.PENABLE
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.PREADY
+@22
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.PADDR[15:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.PWDATA[31:0]
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.PRDATA[31:0]
+@29
+tb_cmsdk_mcu.u_cmsdk_mcu.u_cmsdk_mcu_system.u_axi2apb_subsystem.u_axi2apb_if.u_axi2apb_apb.PSLVERR
+@20000
+-
+@28
+tb_cmsdk_mcu.u_cmsdk_mcu.uart0_txen
+tb_cmsdk_mcu.u_cmsdk_mcu.uart0_txd
+tb_cmsdk_mcu.u_cmsdk_mcu.uart0_rxd
+tb_cmsdk_mcu.u_cmsdk_mcu.uart1_txen
+tb_cmsdk_mcu.u_cmsdk_mcu.uart1_txd
+tb_cmsdk_mcu.u_cmsdk_mcu.uart1_rxd
+tb_cmsdk_mcu.u_cmsdk_mcu.uart2_txen
+tb_cmsdk_mcu.u_cmsdk_mcu.uart2_txd
+tb_cmsdk_mcu.u_cmsdk_mcu.uart2_rxd
+@20000
+-
+[pattern_trace] 1
+[pattern_trace] 0

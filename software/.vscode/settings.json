@@ -1,0 +1,7 @@
+{
+	"files.associations": {
+		"uart_stdout.h": "c",
+		"stdio.h": "c",
+		"cmsdk_cm0.h": "c"
+	}
+}
