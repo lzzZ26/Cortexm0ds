@@ -36,7 +36,7 @@ module ahb2axi4_axi #(
 	output wire  			    	R_READY,		// 读数据就绪
 	input wire						R_LAST,			// 最后一拍读数据
 	input wire [DATA_WIDTH-1:0]		R_DATA,         // 读数据
-	input wire [1:0] 				R_RESP,         // 读响应
+	input wire [1:0] 				R_RESP,         // 读响应信息
 
 	// BC Interface
 	input  wire						BC_WREQ,		// BC写请求

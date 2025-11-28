@@ -52,7 +52,7 @@ module cmsdk_axi_sram #(
 
   output wire                         B_VALID,      // 写响应有效
   input wire                          B_READY,      // 写响应就绪
-  output wire  [1:0]                  B_RESP,       // 写响应
+  output wire  [1:0]                  B_RESP,       // 写响应信息
 
   //----------------- AXI - Read ------------------
   input wire                          AR_SEL,       // 读片选
@@ -67,7 +67,7 @@ module cmsdk_axi_sram #(
   input wire                          R_READY,      // 读数据就绪
   output wire                         R_LAST,       // 读数据最后一拍
   output wire  [31:0]                 R_DATA,       // 读数据
-  output wire  [1:0]                  R_RESP        // 读响应
+  output wire  [1:0]                  R_RESP        // 读响应信息
   );
 
 

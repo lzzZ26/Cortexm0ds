@@ -40,7 +40,7 @@ module axi2apb_if
     input  wire [DATA_WIDTH-1:0]  	W_DATA,			// 写数据有效
     output wire                     B_VALID,		// 写响应有效
     input  wire                     B_READY,		// 写响应准备好
-    output wire [ 1:0]              B_RESP,			// 写响应
+    output wire [ 1:0]              B_RESP,			// 写响应信息
 
     input  wire                     AR_SEL,      	// AXI2APB Device select
     input  wire                     AR_VALID,		// 读请求有效
@@ -54,7 +54,7 @@ module axi2apb_if
     input  wire                     R_READY,		// 读数据准备好
     output wire                     R_LAST,			// 读数据最后一条
     output wire [DATA_WIDTH-1:0]  	R_DATA,			// 读数据
-    output wire [ 1:0]              R_RESP,			// 读响应
+    output wire [ 1:0]              R_RESP,			// 读响应信息
 
     //-----------------------------------------------------------
 	output wire  APBACTIVE,  // APB bus is active, for clock gating of APB bus

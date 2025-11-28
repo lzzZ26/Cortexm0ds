@@ -43,7 +43,7 @@ module cmsdk_axi_default_slave(
 	// 写响应通道
 	output 	wire 					B_VALID,		// 写响应有效
 	input 	wire 					B_READY,		// 写响应就绪
-	output 	wire [1:0] 				B_RESP,			// 写响应
+	output 	wire [1:0] 				B_RESP,			// 写响应信息
 	// 读请求通道
 	input 	wire 					AR_SEL,			// 读片选
 	input 	wire 					AR_VALID,		// 读请求有效
@@ -54,7 +54,7 @@ module cmsdk_axi_default_slave(
 	output 	wire 					R_LAST,			// 最后一拍数据
 	input   wire [7:0]              AR_LEN,			// 读操作拍数
 	output 	wire [31:0] 			R_DATA,			// 读数据
-	output 	wire [1:0] 				R_RESP			// 读响应
+	output 	wire [1:0] 				R_RESP			// 读响应信息
 );
 
 	//---------------------<状态机参数>-------------------------------------

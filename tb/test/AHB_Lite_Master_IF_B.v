@@ -17,7 +17,7 @@ module AHB_Lite_Master_IF #(
 	output wire [DATA_WIDTH-1:0]	HWDATA,			// 写数据
 	input wire  					HREADY,			// 准备好
 	input wire [DATA_WIDTH-1:0]		HRDATA,			// 读数据
-	input wire  					HRESP,			// 响应
+	input wire  					HRESP,			// 响应信息
 	
 	// 仿真输入信号
 	input wire [1:0]				MC_TRANS,		// 传输模式

@@ -75,7 +75,7 @@ module cmsdk_axi2apb_subsystem #(
     input  wire                     W_VALID,        // Write data valid
     output wire                     W_READY,        // Write data ready
     input  wire                     W_LAST,         // Write data last
-    input  wire [31:0]  	          W_DATA,         // Write data
+    input  wire [31:0]  	        W_DATA,         // Write data
     output wire                     B_VALID,        // Write response valid
     input  wire                     B_READY,        // Write response ready
     output wire [ 1:0]              B_RESP,         // Write response
@@ -128,188 +128,188 @@ module cmsdk_axi2apb_subsystem #(
     // --------------------------------------------------------------------------
     // Internal wires
     // --------------------------------------------------------------------------
-    wire     [15:0]  i_paddr;
-    wire             i_psel;
-    wire             i_penable;
-    wire             i_pwrite;
-    wire     [2:0]   i_pprot;
-    wire     [3:0]   i_pstrb;
-    wire     [31:0]  i_pwdata;
+    wire [15:0]  		i_paddr;
+    wire         		i_psel;
+    wire         		i_penable;
+    wire         		i_pwrite;
+    wire [2:0]   		i_pprot;
+    wire [3:0]   		i_pstrb;
+    wire [31:0]  		i_pwdata;
 
     // wire from APB slave mux to APB bridge
-    wire             i_pready_mux;
-    wire     [31:0]  i_prdata_mux;
-    wire             i_pslverr_mux;
+    wire         		i_pready_mux;
+    wire [31:0]  		i_prdata_mux;
+    wire         		i_pslverr_mux;
 
     // Peripheral signals
-    wire             timer0_psel;
-    wire     [31:0]  timer0_prdata;
-    wire             timer0_pready;
-    wire             timer0_pslverr;
+    wire         		timer0_psel;
+    wire [31:0]  		timer0_prdata;
+    wire         		timer0_pready;
+    wire         		timer0_pslverr;
 
-    wire             timer1_psel;
-    wire     [31:0]  timer1_prdata;
-    wire             timer1_pready;
-    wire             timer1_pslverr;
+    wire         		timer1_psel;
+    wire [31:0]  		timer1_prdata;
+    wire         		timer1_pready;
+    wire         		timer1_pslverr;
 
-    wire             dualtimer2_psel;
-    wire     [31:0]  dualtimer2_prdata;
-    wire             dualtimer2_pready;
-    wire             dualtimer2_pslverr;
+    wire         		dualtimer2_psel;
+    wire [31:0]  		dualtimer2_prdata;
+    wire         		dualtimer2_pready;
+    wire         		dualtimer2_pslverr;
 
-    wire             watchdog_psel;
-    wire     [31:0]  watchdog_prdata;
-    wire             watchdog_pready;
-    wire             watchdog_pslverr;
+    wire         		watchdog_psel;
+    wire [31:0]  		watchdog_prdata;
+    wire         		watchdog_pready;
+    wire         		watchdog_pslverr;
 
-    wire             uart0_psel;
-    wire     [31:0]  uart0_prdata;
-    wire             uart0_pready;
-    wire             uart0_pslverr;
+    wire         		uart0_psel;
+    wire [31:0]  		uart0_prdata;
+    wire         		uart0_pready;
+    wire         		uart0_pslverr;
 
-    wire             uart1_psel;
-    wire     [31:0]  uart1_prdata;
-    wire             uart1_pready;
-    wire             uart1_pslverr;
+    wire         		uart1_psel;
+    wire [31:0]  		uart1_prdata;
+    wire         		uart1_pready;
+    wire         		uart1_pslverr;
 
-    wire             uart2_psel;
-    wire     [31:0]  uart2_prdata;
-    wire             uart2_pready;
-    wire             uart2_pslverr;
+    wire         		uart2_psel;
+    wire [31:0]  		uart2_prdata;
+    wire         		uart2_pready;
+    wire         		uart2_pslverr;
 
-    wire             test_slave_psel;
-    wire     [31:0]  test_slave_prdata;
-    wire             test_slave_pready;
-    wire             test_slave_pslverr;
+    wire         		test_slave_psel;
+    wire [31:0]  		test_slave_prdata;
+    wire         		test_slave_pready;
+    wire         		test_slave_pslverr;
 
-    wire             psel3;
-    wire             psel7;
-    wire             psel9;
-    wire             psel10;
+    wire         		psel3;
+    wire         		psel7;
+    wire         		psel9;
+    wire         		psel10;
 
     // 扩展接口信号
-    wire             ext12_psel;
-    wire             ext13_psel;
-    wire             ext14_psel;
-    wire             ext15_psel;
+    wire             	ext12_psel;
+    wire             	ext13_psel;
+    wire             	ext14_psel;
+    wire             	ext15_psel;
 
-    wire [31:0]      ext12_prdata;
-    wire             ext12_pready;
-    wire             ext12_pslverr;
+    wire [31:0]      	ext12_prdata;
+    wire             	ext12_pready;
+    wire             	ext12_pslverr;
 
-    wire [31:0]      ext13_prdata;
-    wire             ext13_pready;
-    wire             ext13_pslverr;
+    wire [31:0]      	ext13_prdata;
+    wire             	ext13_pready;
+    wire             	ext13_pslverr;
 
-    wire [31:0]      ext14_prdata;
-    wire             ext14_pready;
-    wire             ext14_pslverr;
+    wire [31:0]      	ext14_prdata;
+    wire             	ext14_pready;
+    wire             	ext14_pslverr;
 
-    wire [31:0]      ext15_prdata;
-    wire             ext15_pready;
-    wire             ext15_pslverr;
+    wire [31:0]      	ext15_prdata;
+    wire             	ext15_pready;
+    wire             	ext15_pslverr;
 
     // Interrupt signals from peripherals
-    wire             timer0_int;
-    wire             timer1_int;
-    wire             dualtimer2a_int;
-    wire             dualtimer2b_int;
-    wire             dualtimer2_comb_int;
+    wire             	timer0_int;
+    wire             	timer1_int;
+    wire             	dualtimer2a_int;
+    wire             	dualtimer2b_int;
+    wire             	dualtimer2_comb_int;
 
-    wire             uart0_txint;
-    wire             uart0_rxint;
-    wire             uart0_txovrint;
-    wire             uart0_rxovrint;
-    wire             uart0_combined_int;
+    wire             	uart0_txint;
+    wire             	uart0_rxint;
+    wire             	uart0_txovrint;
+    wire             	uart0_rxovrint;
+    wire             	uart0_combined_int;
 
-    wire             uart1_txint;
-    wire             uart1_rxint;
-    wire             uart1_txovrint;
-    wire             uart1_rxovrint;
-    wire             uart1_combined_int;
+    wire             	uart1_txint;
+    wire             	uart1_rxint;
+    wire             	uart1_txovrint;
+    wire             	uart1_rxovrint;
+    wire             	uart1_combined_int;
 
-    wire             uart2_txint;
-    wire             uart2_rxint;
-    wire             uart2_txovrint;
-    wire             uart2_rxovrint;
-    wire             uart2_combined_int;
+    wire             	uart2_txint;
+    wire             	uart2_rxint;
+    wire             	uart2_txovrint;
+    wire             	uart2_rxovrint;
+    wire             	uart2_combined_int;
 
-    wire             uart0_overflow_int;
-    wire             uart1_overflow_int;
-    wire             uart2_overflow_int;
+    wire             	uart0_overflow_int;
+    wire             	uart1_overflow_int;
+    wire             	uart2_overflow_int;
 
-    wire             watchdog_int;
-    wire             watchdog_rst;
+    wire             	watchdog_int;
+    wire             	watchdog_rst;
 
     // Synchronized interrupt signals
-    wire             i_uart0_txint;
-    wire             i_uart0_rxint;
-    wire             i_uart0_overflow_int;
-    wire             i_uart1_txint;
-    wire             i_uart1_rxint;
-    wire             i_uart1_overflow_int;
-    wire             i_uart2_txint;
-    wire             i_uart2_rxint;
-    wire             i_uart2_overflow_int;
-    wire             i_timer0_int;
-    wire             i_timer1_int;
-    wire             i_dualtimer2_int;
-    wire             i_watchdog_int;
-    wire             i_watchdog_rst;
+    wire             	i_uart0_txint;
+    wire             	i_uart0_rxint;
+    wire             	i_uart0_overflow_int;
+    wire             	i_uart1_txint;
+    wire             	i_uart1_rxint;
+    wire             	i_uart1_overflow_int;
+    wire             	i_uart2_txint;
+    wire             	i_uart2_rxint;
+    wire             	i_uart2_overflow_int;
+    wire             	i_timer0_int;
+    wire             	i_timer1_int;
+    wire             	i_dualtimer2_int;
+    wire             	i_watchdog_int;
+    wire             	i_watchdog_rst;
 
     // AXI to APB bus bridge
     axi2apb_if
-    #(.ADDR_WIDTH    (16),
-      .DATA_WIDTH    (32)
+    #(.ADDR_WIDTH		(16),
+      .DATA_WIDTH		(32)
      )
     u_axi2apb_if(
     // AXI side
-    .ACLK		      (ACLK),		
-    .ARESETn	    (ARESETn),		
+    .ACLK				(ACLK),		
+    .ARESETn			(ARESETn),		
 
-    .AW_SEL		    (AW_SEL),
-    .AW_VALID	    (AW_VALID),
-    .AW_READY	    (AW_READY),
-    .AW_SIZE		  (AW_SIZE),
-    .AW_BURST	    (AW_BURST),
-    .AW_LEN		    (AW_LEN),
-    .AW_ADDR		  (AW_ADDR[15:0]),	
+    .AW_SEL				(AW_SEL),
+    .AW_VALID			(AW_VALID),
+    .AW_READY			(AW_READY),
+    .AW_SIZE			(AW_SIZE),
+    .AW_BURST			(AW_BURST),
+    .AW_LEN				(AW_LEN),
+    .AW_ADDR			(AW_ADDR[15:0]),	
 
-    .W_VALID		  (W_VALID),
-    .W_READY		  (W_READY),
-    .W_LAST		    (W_LAST),
-    .W_DATA		    (W_DATA),
-    .B_VALID		  (B_VALID),
-    .B_READY		  (B_READY),
-    .B_RESP		    (B_RESP),
+    .W_VALID			(W_VALID),
+    .W_READY			(W_READY),
+    .W_LAST				(W_LAST),
+    .W_DATA				(W_DATA),
+    .B_VALID			(B_VALID),
+    .B_READY			(B_READY),
+    .B_RESP				(B_RESP),
 
-    .AR_SEL		    (AR_SEL),
-    .AR_VALID	    (AR_VALID),
-    .AR_READY	    (AR_READY),
-    .AR_SIZE		  (AR_SIZE),
-    .AR_BURST	    (AR_BURST),
-    .AR_LEN		    (AR_LEN),
-    .AR_ADDR		  (AR_ADDR[15:0]),
+    .AR_SEL				(AR_SEL),
+    .AR_VALID			(AR_VALID),
+    .AR_READY			(AR_READY),
+    .AR_SIZE			(AR_SIZE),
+    .AR_BURST			(AR_BURST),
+    .AR_LEN				(AR_LEN),
+    .AR_ADDR			(AR_ADDR[15:0]),
 
-    .R_VALID		  (R_VALID),
-    .R_READY		  (R_READY),
-    .R_LAST		    (R_LAST),
-    .R_DATA		    (R_DATA),
-    .R_RESP		    (R_RESP),
+    .R_VALID			(R_VALID),
+    .R_READY			(R_READY),
+    .R_LAST				(R_LAST),
+    .R_DATA				(R_DATA),
+    .R_RESP				(R_RESP),
 
-    .APBACTIVE    (APBACTIVE),
+    .APBACTIVE  		(APBACTIVE),
 
-    .PCLK		      (ACLK),		
-    .PRESETn	    (ARESETn),		
-    .PSEL         (i_psel),
-    .PENABLE      (i_penable),
-    .PSTRB        (i_pstrb),
-    .PWRITE       (i_pwrite),
-    .PADDR        (i_paddr[15:0]),
-    .PWDATA       (i_pwdata),
-    .PREADY       (i_pready_mux),
-    .PRDATA       (i_prdata_mux),
-    .PSLVERR      (i_pslverr_mux)
+    .PCLK				(ACLK),		
+    .PRESETn			(ARESETn),		
+    .PSEL       		(i_psel),
+    .PENABLE    		(i_penable),
+    .PSTRB      		(i_pstrb),
+    .PWRITE     		(i_pwrite),
+    .PADDR      		(i_paddr[15:0]),
+    .PWDATA     		(i_pwdata),
+    .PREADY     		(i_pready_mux),
+    .PRDATA     		(i_prdata_mux),
+    .PSLVERR    		(i_pslverr_mux)
     );
 
   // APB slave decoder and multiplexer
@@ -334,93 +334,93 @@ module cmsdk_axi2apb_subsystem #(
     )
     u_apb_slave_mux (
     // Inputs
-    .DECODE4BIT        (i_paddr[15:12]),
-    .PSEL              (i_psel),
+    .DECODE4BIT        	(i_paddr[15:12]),
+    .PSEL              	(i_psel),
     // PSEL (output) and return status & data (inputs) for each port
-    .PSEL0             (timer0_psel),
-    .PREADY0           (timer0_pready),
-    .PRDATA0           (timer0_prdata),
-    .PSLVERR0          (timer0_pslverr),
+    .PSEL0             	(timer0_psel),
+    .PREADY0           	(timer0_pready),
+    .PRDATA0           	(timer0_prdata),
+    .PSLVERR0          	(timer0_pslverr),
 
-    .PSEL1             (timer1_psel),
-    .PREADY1           (timer1_pready),
-    .PRDATA1           (timer1_prdata),
-    .PSLVERR1          (timer1_pslverr),
+    .PSEL1             	(timer1_psel),
+    .PREADY1           	(timer1_pready),
+    .PRDATA1           	(timer1_prdata),
+    .PSLVERR1          	(timer1_pslverr),
 
-    .PSEL2             (dualtimer2_psel),
-    .PREADY2           (dualtimer2_pready),
-    .PRDATA2           (dualtimer2_prdata),
-    .PSLVERR2          (dualtimer2_pslverr),
+    .PSEL2         		(dualtimer2_psel),
+    .PREADY2       		(dualtimer2_pready),
+    .PRDATA2       		(dualtimer2_prdata),
+    .PSLVERR2      		(dualtimer2_pslverr),
 
-    .PSEL3             (psel3),
-    .PREADY3           (1'b1),
-    .PRDATA3           (32'h00000000),
-    .PSLVERR3          (1'b0),
+    .PSEL3          	(psel3),
+    .PREADY3        	(1'b1),
+    .PRDATA3        	(32'h00000000),
+    .PSLVERR3       	(1'b0),
 
-    .PSEL4             (uart0_psel),
-    .PREADY4           (uart0_pready),
-    .PRDATA4           (uart0_prdata),
-    .PSLVERR4          (uart0_pslverr),
+    .PSEL4        		(uart0_psel),
+    .PREADY4      		(uart0_pready),
+    .PRDATA4      		(uart0_prdata),
+    .PSLVERR4     		(uart0_pslverr),
 
-    .PSEL5             (uart1_psel),
-    .PREADY5           (uart1_pready),
-    .PRDATA5           (uart1_prdata),
-    .PSLVERR5          (uart1_pslverr),
+    .PSEL5         		(uart1_psel),
+    .PREADY5       		(uart1_pready),
+    .PRDATA5       		(uart1_prdata),
+    .PSLVERR5      		(uart1_pslverr),
 
-    .PSEL6             (uart2_psel),
-    .PREADY6           (uart2_pready),
-    .PRDATA6           (uart2_prdata),
-    .PSLVERR6          (uart2_pslverr),
+    .PSEL6          	(uart2_psel),
+    .PREADY6        	(uart2_pready),
+    .PRDATA6        	(uart2_prdata),
+    .PSLVERR6       	(uart2_pslverr),
 
-    .PSEL7             (psel7),
-    .PREADY7           (1'b1),
-    .PRDATA7           (32'h00000000),
-    .PSLVERR7          (1'b0),
+    .PSEL7          	(psel7),
+    .PREADY7        	(1'b1),
+    .PRDATA7        	(32'h00000000),
+    .PSLVERR7       	(1'b0),
 
-    .PSEL8             (watchdog_psel),
-    .PREADY8           (watchdog_pready),
-    .PRDATA8           (watchdog_prdata),
-    .PSLVERR8          (watchdog_pslverr),
+    .PSEL8          	(watchdog_psel),
+    .PREADY8        	(watchdog_pready),
+    .PRDATA8        	(watchdog_prdata),
+    .PSLVERR8       	(watchdog_pslverr),
 
-    .PSEL9             (psel9),
-    .PREADY9           (1'b1),
-    .PRDATA9           (32'h00000000),
-    .PSLVERR9          (1'b0),
+    .PSEL9           	(psel9),
+    .PREADY9         	(1'b1),
+    .PRDATA9         	(32'h00000000),
+    .PSLVERR9        	(1'b0),
 
-    .PSEL10            (psel10),
-    .PREADY10          (1'b1),
-    .PRDATA10          (32'h00000000),
-    .PSLVERR10         (1'b0),
+    .PSEL10          	(psel10),
+    .PREADY10        	(1'b1),
+    .PRDATA10        	(32'h00000000),
+    .PSLVERR10       	(1'b0),
 
-    .PSEL11            (test_slave_psel),
-    .PREADY11          (test_slave_pready),
-    .PRDATA11          (test_slave_prdata),
-    .PSLVERR11         (test_slave_pslverr),
+    .PSEL11         	(test_slave_psel),
+    .PREADY11       	(test_slave_pready),
+    .PRDATA11       	(test_slave_prdata),
+    .PSLVERR11      	(test_slave_pslverr),
 
-    .PSEL12            (ext12_psel),
-    .PREADY12          (ext12_pready),
-    .PRDATA12          (ext12_prdata),
-    .PSLVERR12         (ext12_pslverr),
+    .PSEL12         	(ext12_psel),
+    .PREADY12       	(ext12_pready),
+    .PRDATA12       	(ext12_prdata),
+    .PSLVERR12      	(ext12_pslverr),
 
-    .PSEL13            (ext13_psel),
-    .PREADY13          (ext13_pready),
-    .PRDATA13          (ext13_prdata),
-    .PSLVERR13         (ext13_pslverr),
+    .PSEL13          	(ext13_psel),
+    .PREADY13        	(ext13_pready),
+    .PRDATA13        	(ext13_prdata),
+    .PSLVERR13       	(ext13_pslverr),
 
-    .PSEL14            (ext14_psel),
-    .PREADY14          (ext14_pready),
-    .PRDATA14          (ext14_prdata),
-    .PSLVERR14         (ext14_pslverr),
+    .PSEL14         	(ext14_psel),
+    .PREADY14       	(ext14_pready),
+    .PRDATA14       	(ext14_prdata),
+    .PSLVERR14      	(ext14_pslverr),
 
-    .PSEL15            (ext15_psel),
-    .PREADY15          (ext15_pready),
-    .PRDATA15          (ext15_prdata),
-    .PSLVERR15         (ext15_pslverr),
+    .PSEL15          	(ext15_psel),
+    .PREADY15        	(ext15_pready),
+    .PRDATA15        	(ext15_prdata),
+    .PSLVERR15       	(ext15_pslverr),
 
     // Output
-    .PREADY            (i_pready_mux),
-    .PRDATA            (i_prdata_mux),
-    .PSLVERR           (i_pslverr_mux)
+    .PREADY          	(i_pready_mux),
+    .PRDATA          	(i_prdata_mux),
+    .PSLVERR         	(i_pslverr_mux)
     );
 
   // -----------------------------------------------------------------
@@ -428,25 +428,25 @@ module cmsdk_axi2apb_subsystem #(
 
   generate if (INCLUDE_APB_TIMER0 == 1) begin : gen_apb_timer_0
   cmsdk_apb_timer u_apb_timer_0 (
-    .PCLK              (PCLK),     // PCLK for timer operation
-    .PCLKG             (PCLKG),    // Gated PCLK for bus
-    .PRESETn           (PRESETn),  // Reset
+    .PCLK            	(PCLK),     // PCLK for timer operation
+    .PCLKG           	(PCLKG),    // Gated PCLK for bus
+    .PRESETn         	(PRESETn),  // Reset
     // APB interface inputs
-    .PSEL              (timer0_psel),
-    .PENABLE           (i_penable),
-    .PWRITE            (i_pwrite),
-    .PADDR             (i_paddr[11:2]),
-    .PWDATA            (i_pwdata),
+    .PSEL            	(timer0_psel),
+    .PENABLE         	(i_penable),
+    .PWRITE          	(i_pwrite),
+    .PADDR           	(i_paddr[11:2]),
+    .PWDATA          	(i_pwdata),
 
-    .ECOREVNUM         (4'h0),// Engineering-change-order revision bits
+    .ECOREVNUM       	(4'h0),// Engineering-change-order revision bits
 
       // APB interface outputs
-    .PREADY            (timer0_pready),
-    .PRDATA            (timer0_prdata),
-    .PSLVERR           (timer0_pslverr),
+    .PREADY         	(timer0_pready),
+    .PRDATA         	(timer0_prdata),
+    .PSLVERR        	(timer0_pslverr),
 
-    .EXTIN             (timer0_extin),  // External input
-    .TIMERINT          (timer0_int)     // interrupt output
+    .EXTIN           	(timer0_extin),  // External input
+    .TIMERINT        	(timer0_int)     // interrupt output
   );
   end else
   begin : gen_no_apb_timer_0
@@ -458,25 +458,25 @@ module cmsdk_axi2apb_subsystem #(
 
   generate if (INCLUDE_APB_TIMER1 == 1) begin : gen_apb_timer_1
   cmsdk_apb_timer u_apb_timer_1 (
-    .PCLK              (PCLK),     // PCLK for timer operation
-    .PCLKG             (PCLKG),    // Gated PCLK for bus
-    .PRESETn           (PRESETn),  // Reset
+    .PCLK           	(PCLK),     // PCLK for timer operation
+    .PCLKG          	(PCLKG),    // Gated PCLK for bus
+    .PRESETn        	(PRESETn),  // Reset
     // APB interface inputs
-    .PSEL              (timer1_psel),
-    .PENABLE           (i_penable),
-    .PWRITE            (i_pwrite),
-    .PADDR             (i_paddr[11:2]),
-    .PWDATA            (i_pwdata),
+    .PSEL           	(timer1_psel),
+    .PENABLE        	(i_penable),
+    .PWRITE         	(i_pwrite),
+    .PADDR          	(i_paddr[11:2]),
+    .PWDATA         	(i_pwdata),
 
-    .ECOREVNUM         (4'h0),// Engineering-change-order revision bits
+    .ECOREVNUM        	(4'h0),// Engineering-change-order revision bits
 
       // APB interface outputs
-    .PREADY            (timer1_pready),
-    .PRDATA            (timer1_prdata),
-    .PSLVERR           (timer1_pslverr),
+    .PREADY         	(timer1_pready),
+    .PRDATA         	(timer1_prdata),
+    .PSLVERR        	(timer1_pslverr),
 
-    .EXTIN             (timer1_extin),  // External input
-    .TIMERINT          (timer1_int)     // interrupt output
+    .EXTIN           	(timer1_extin),  // External input
+    .TIMERINT        	(timer1_int)     // interrupt output
   );
   end else
   begin : gen_no_apb_timer_1
@@ -491,26 +491,26 @@ module cmsdk_axi2apb_subsystem #(
   generate if (INCLUDE_APB_DUALTIMER0 == 1) begin : gen_apb_dualtimers_2
   cmsdk_apb_dualtimers u_apb_dualtimers_2 (
    // Inputs
-    .PCLK              (PCLKG),
-    .PRESETn           (PRESETn),
-    .PSEL              (dualtimer2_psel),
-    .PENABLE           (i_penable),
-    .PWRITE            (i_pwrite),
-    .PADDR             (i_paddr[11:2]),
-    .PWDATA            (i_pwdata),
+    .PCLK          		(PCLKG),
+    .PRESETn       		(PRESETn),
+    .PSEL          		(dualtimer2_psel),
+    .PENABLE       		(i_penable),
+    .PWRITE        		(i_pwrite),
+    .PADDR         		(i_paddr[11:2]),
+    .PWDATA        		(i_pwdata),
 
-    .TIMCLK            (PCLK),
-    .TIMCLKEN1         (1'b1), // simple case:the timer 0 clock always enable
-    .TIMCLKEN2         (1'b1), // simple case:the timer 1 clock always enable
+    .TIMCLK        		(PCLK),
+    .TIMCLKEN1     		(1'b1), // simple case:the timer 0 clock always enable
+    .TIMCLKEN2     		(1'b1), // simple case:the timer 1 clock always enable
 
-    .ECOREVNUM         (4'h0),// Engineering-change-order revision bits
+    .ECOREVNUM      	(4'h0),// Engineering-change-order revision bits
 
    // Outputs
-    .PRDATA            (dualtimer2_prdata),
+    .PRDATA         	(dualtimer2_prdata),
 
-    .TIMINT1           (dualtimer2a_int), // not used
-    .TIMINT2           (dualtimer2b_int), // not used
-    .TIMINTC           (dualtimer2_comb_int)
+    .TIMINT1         	(dualtimer2a_int), // not used
+    .TIMINT2         	(dualtimer2b_int), // not used
+    .TIMINTC         	(dualtimer2_comb_int)
 
   );
   end else
@@ -532,25 +532,25 @@ module cmsdk_axi2apb_subsystem #(
   generate if (INCLUDE_APB_WATCHDOG == 1) begin : gen_apb_watchdog
   cmsdk_apb_watchdog u_apb_watchdog (
    // Inputs
-    .PCLK              (PCLKG),
-    .PRESETn           (PRESETn),
-    .PSEL              (watchdog_psel),
-    .PENABLE           (i_penable),
-    .PWRITE            (i_pwrite),
-    .PADDR             (i_paddr[11:2]),
-    .PWDATA            (i_pwdata),
+    .PCLK          		(PCLKG),
+    .PRESETn       		(PRESETn),
+    .PSEL          		(watchdog_psel),
+    .PENABLE       		(i_penable),
+    .PWRITE        		(i_pwrite),
+    .PADDR         		(i_paddr[11:2]),
+    .PWDATA        		(i_pwdata),
 
-    .WDOGCLK           (PCLK),
-    .WDOGCLKEN         (1'b1),
-    .WDOGRESn          (PRESETn),
+    .WDOGCLK        	(PCLK),
+    .WDOGCLKEN      	(1'b1),
+    .WDOGRESn       	(PRESETn),
 
-    .ECOREVNUM         (4'h0),// Engineering-change-order revision bits
+    .ECOREVNUM         	(4'h0),// Engineering-change-order revision bits
 
    // Outputs
-    .PRDATA            (watchdog_prdata),
+    .PRDATA            	(watchdog_prdata),
 
-    .WDOGINT           (watchdog_int),  // connect to NMI
-    .WDOGRES           (watchdog_rst)   // connect to reset generator
+    .WDOGINT           	(watchdog_int),  // connect to NMI
+    .WDOGRES           	(watchdog_rst)   // connect to reset generator
 
   );
   end else
@@ -569,31 +569,31 @@ module cmsdk_axi2apb_subsystem #(
   // UARTs
   generate if (INCLUDE_APB_UART0 == 1) begin : gen_apb_uart_0
   cmsdk_apb_uart u_apb_uart_0 (
-    .PCLK              (PCLK),     // Peripheral clock
-    .PCLKG             (PCLKG),    // Gated PCLK for bus
-    .PRESETn           (PRESETn),  // Reset
+    .PCLK              	(PCLK),     // Peripheral clock
+    .PCLKG             	(PCLKG),    // Gated PCLK for bus
+    .PRESETn           	(PRESETn),  // Reset
 
-    .PSEL              (uart0_psel),     // APB interface inputs
-    .PENABLE           (i_penable),
-    .PWRITE            (i_pwrite),
-    .PADDR             (i_paddr[11:2]),
-    .PWDATA            (i_pwdata),
-    .PREADY            (uart0_pready),
-    .PRDATA            (uart0_prdata),   // APB interface outputs
-    .PSLVERR           (uart0_pslverr),
+    .PSEL              	(uart0_psel),     // APB interface inputs
+    .PENABLE           	(i_penable),
+    .PWRITE            	(i_pwrite),
+    .PADDR             	(i_paddr[11:2]),
+    .PWDATA            	(i_pwdata),
+    .PREADY            	(uart0_pready),
+    .PRDATA            	(uart0_prdata),   // APB interface outputs
+    .PSLVERR           	(uart0_pslverr),
 
-    .ECOREVNUM         (4'h0),// Engineering-change-order revision bits
+    .ECOREVNUM        	(4'h0),// Engineering-change-order revision bits
 
-    .RXD               (uart0_rxd),      // Receive data
-    .TXD               (uart0_txd),      // Transmit data
-    .TXEN              (uart0_txen),     // Transmit Enabled
-    .BAUDTICK          (),   // Baud rate x16 tick output (for testing)
+    .RXD               	(uart0_rxd),      // Receive data
+    .TXD               	(uart0_txd),      // Transmit data
+    .TXEN              	(uart0_txen),     // Transmit Enabled
+    .BAUDTICK          	(),   // Baud rate x16 tick output (for testing)
 
-    .TXINT             (uart0_txint),       // Transmit Interrupt
-    .RXINT             (uart0_rxint),       // Receive  Interrupt
-    .TXOVRINT          (uart0_txovrint),    // Transmit Overrun Interrupt
-    .RXOVRINT          (uart0_rxovrint),    // Receive  Overrun Interrupt
-    .UARTINT           (uart0_combined_int) // Combined Interrupt
+    .TXINT             	(uart0_txint),       // Transmit Interrupt
+    .RXINT             	(uart0_rxint),       // Receive  Interrupt
+    .TXOVRINT          	(uart0_txovrint),    // Transmit Overrun Interrupt
+    .RXOVRINT          	(uart0_rxovrint),    // Receive  Overrun Interrupt
+    .UARTINT           	(uart0_combined_int) // Combined Interrupt
   );
   end else
   begin : gen_no_apb_uart_0
@@ -611,31 +611,31 @@ module cmsdk_axi2apb_subsystem #(
 
   generate if (INCLUDE_APB_UART1 == 1) begin : gen_apb_uart_1
   cmsdk_apb_uart u_apb_uart_1 (
-    .PCLK              (PCLK),     // Peripheral clock
-    .PCLKG             (PCLKG),    // Gated PCLK for bus
-    .PRESETn           (PRESETn),  // Reset
+    .PCLK              	(PCLK),     // Peripheral clock
+    .PCLKG             	(PCLKG),    // Gated PCLK for bus
+    .PRESETn           	(PRESETn),  // Reset
 
-    .PSEL              (uart1_psel),     // APB interface inputs
-    .PENABLE           (i_penable),
-    .PWRITE            (i_pwrite),
-    .PADDR             (i_paddr[11:2]),
-    .PWDATA            (i_pwdata),
-    .PREADY            (uart1_pready),
-    .PRDATA            (uart1_prdata),   // APB interface outputs
-    .PSLVERR           (uart1_pslverr),
+    .PSEL              	(uart1_psel),     // APB interface inputs
+    .PENABLE           	(i_penable),
+    .PWRITE            	(i_pwrite),
+    .PADDR             	(i_paddr[11:2]),
+    .PWDATA            	(i_pwdata),
+    .PREADY            	(uart1_pready),
+    .PRDATA            	(uart1_prdata),   // APB interface outputs
+    .PSLVERR           	(uart1_pslverr),
 
-    .ECOREVNUM         (4'h0),// Engineering-change-order revision bits
+    .ECOREVNUM         	(4'h0),// Engineering-change-order revision bits
 
-    .RXD               (uart1_rxd),      // Receive data
-    .TXD               (uart1_txd),      // Transmit data
-    .TXEN              (uart1_txen),     // Transmit Enabled
-    .BAUDTICK          (),   // Baud rate x16 tick output (for testing)
+    .RXD               	(uart1_rxd),      // Receive data
+    .TXD               	(uart1_txd),      // Transmit data
+    .TXEN              	(uart1_txen),     // Transmit Enabled
+    .BAUDTICK          	(),   // Baud rate x16 tick output (for testing)
 
-    .TXINT             (uart1_txint),       // Transmit Interrupt
-    .RXINT             (uart1_rxint),       // Receive  Interrupt
-    .TXOVRINT          (uart1_txovrint),    // Transmit Overrun Interrupt
-    .RXOVRINT          (uart1_rxovrint),    // Receive  Overrun Interrupt
-    .UARTINT           (uart1_combined_int) // Combined Interrupt
+    .TXINT             	(uart1_txint),       // Transmit Interrupt
+    .RXINT             	(uart1_rxint),       // Receive  Interrupt
+    .TXOVRINT          	(uart1_txovrint),    // Transmit Overrun Interrupt
+    .RXOVRINT          	(uart1_rxovrint),    // Receive  Overrun Interrupt
+    .UARTINT           	(uart1_combined_int) // Combined Interrupt
   );
   end else
   begin : gen_no_apb_uart_1
@@ -655,28 +655,28 @@ module cmsdk_axi2apb_subsystem #(
   // 直接替换UART1
   generate if (INCLUDE_APB_UART1 == 1) begin : gen_apb_uart_1
   cmsdk_apb1_uart u_apb_uart_1 (
-    .PCLK              (PCLK),            // Peripheral clock
-    .PRESETn           (PRESETn),         // Reset
+    .PCLK              	(PCLK),            // Peripheral clock
+    .PRESETn           	(PRESETn),         // Reset
 
-    .PSEL              (uart1_psel),      // APB interface inputs
-    .PENABLE           (i_penable),
-    .PWRITE            (i_pwrite),
-    .PADDR             (i_paddr[11:2]),
-    .PWDATA            (i_pwdata),
-    .PREADY            (uart1_pready),
-    .PRDATA            (uart1_prdata),    // APB interface outputs
-    .PSLVERR           (uart1_pslverr),
+    .PSEL              	(uart1_psel),      // APB interface inputs
+    .PENABLE           	(i_penable),
+    .PWRITE            	(i_pwrite),
+    .PADDR             	(i_paddr[11:2]),
+    .PWDATA            	(i_pwdata),
+    .PREADY            	(uart1_pready),
+    .PRDATA            	(uart1_prdata),    // APB interface outputs
+    .PSLVERR           	(uart1_pslverr),
 
-    .RXD               (uart1_rxd),       // Receive data
-    .TXD               (uart1_txd),       // Transmit data
-    .TXEN              (uart1_txen),      // Transmit Enabled
-    .BAUDTICK          (),   // Baud rate x16 tick output (for testing)
+    .RXD               	(uart1_rxd),       // Receive data
+    .TXD               	(uart1_txd),       // Transmit data
+    .TXEN              	(uart1_txen),      // Transmit Enabled
+    .BAUDTICK          	(),   // Baud rate x16 tick output (for testing)
 
-    .TXINT             (uart1_txint),       // Transmit Interrupt
-    .RXINT             (uart1_rxint),       // Receive  Interrupt
-    .TXOVRINT          (uart1_txovrint),    // Transmit Overrun Interrupt
-    .RXOVRINT          (uart1_rxovrint),    // Receive  Overrun Interrupt
-    .UARTINT           (uart1_combined_int) // Combined Interrupt
+    .TXINT             	(uart1_txint),       // Transmit Interrupt
+    .RXINT             	(uart1_rxint),       // Receive  Interrupt
+    .TXOVRINT          	(uart1_txovrint),    // Transmit Overrun Interrupt
+    .RXOVRINT          	(uart1_rxovrint),    // Receive  Overrun Interrupt
+    .UARTINT           	(uart1_combined_int) // Combined Interrupt
   );
   end else
   begin : gen_no_apb_uart_1
@@ -695,31 +695,31 @@ module cmsdk_axi2apb_subsystem #(
 
   generate if (INCLUDE_APB_UART2 == 1) begin : gen_apb_uart_2
   cmsdk_apb_uart u_apb_uart_2 (
-    .PCLK              (PCLK),     // Peripheral clock
-    .PCLKG             (PCLKG),    // Gated PCLK for bus
-    .PRESETn           (PRESETn),  // Reset
+    .PCLK              	(PCLK),     // Peripheral clock
+    .PCLKG             	(PCLKG),    // Gated PCLK for bus
+    .PRESETn           	(PRESETn),  // Reset
 
-    .PSEL              (uart2_psel),     // APB interface inputs
-    .PENABLE           (i_penable),
-    .PWRITE            (i_pwrite),
-    .PADDR             (i_paddr[11:2]),
-    .PWDATA            (i_pwdata),
-    .PREADY            (uart2_pready),
-    .PRDATA            (uart2_prdata),   // APB interface outputs
-    .PSLVERR           (uart2_pslverr),
+    .PSEL              	(uart2_psel),     // APB interface inputs
+    .PENABLE           	(i_penable),
+    .PWRITE            	(i_pwrite),
+    .PADDR             	(i_paddr[11:2]),
+    .PWDATA            	(i_pwdata),
+    .PREADY            	(uart2_pready),
+    .PRDATA            	(uart2_prdata),   // APB interface outputs
+    .PSLVERR           	(uart2_pslverr),
 
-    .ECOREVNUM         (4'h0),// Engineering-change-order revision bits
+    .ECOREVNUM         	(4'h0),// Engineering-change-order revision bits
 
-    .RXD               (uart2_rxd),      // Receive data
-    .TXD               (uart2_txd),      // Transmit data
-    .TXEN              (uart2_txen),     // Transmit Enabled
-    .BAUDTICK          (),   // Baud rate x16 tick output (for testing)
+    .RXD               	(uart2_rxd),      // Receive data
+    .TXD               	(uart2_txd),      // Transmit data
+    .TXEN              	(uart2_txen),     // Transmit Enabled
+    .BAUDTICK          	(),   // Baud rate x16 tick output (for testing)
 
-    .TXINT             (uart2_txint),       // Transmit Interrupt
-    .RXINT             (uart2_rxint),       // Receive  Interrupt
-    .TXOVRINT          (uart2_txovrint),    // Transmit Overrun Interrupt
-    .RXOVRINT          (uart2_rxovrint),    // Receive  Overrun Interrupt
-    .UARTINT           (uart2_combined_int) // Combined Interrupt
+    .TXINT             	(uart2_txint),       // Transmit Interrupt
+    .RXINT             	(uart2_rxint),       // Receive  Interrupt
+    .TXOVRINT          	(uart2_txovrint),    // Transmit Overrun Interrupt
+    .RXOVRINT          	(uart2_rxovrint),    // Receive  Overrun Interrupt
+    .UARTINT           	(uart2_combined_int) // Combined Interrupt
   );
   end else
   begin : gen_no_apb_uart_2
@@ -740,18 +740,18 @@ module cmsdk_axi2apb_subsystem #(
   // Test slave (for validation purpose)
   generate if (INCLUDE_APB_TEST_SLAVE == 1) begin : gen_apb_test_slave
   cmsdk_apb_test_slave u_apb_test_slave(
-    .PCLK              (PCLKG),    // use Gated PCLK for bus
-    .PRESETn           (PRESETn),  // Reset
+    .PCLK              	(PCLKG),    // use Gated PCLK for bus
+    .PRESETn           	(PRESETn),  // Reset
 
-    .PSEL              (test_slave_psel),     // APB interface inputs
-    .PENABLE           (i_penable),
-    .PWRITE            (i_pwrite),
-    .PSTRB             (i_pstrb[3:0]),
-    .PADDR             (i_paddr[11:2]),
-    .PWDATA            (i_pwdata),
-    .PREADY            (test_slave_pready),
-    .PRDATA            (test_slave_prdata),   // APB interface outputs
-    .PSLVERR           (test_slave_pslverr)
+    .PSEL              	(test_slave_psel),     // APB interface inputs
+    .PENABLE           	(i_penable),
+    .PWRITE            	(i_pwrite),
+    .PSTRB             	(i_pstrb[3:0]),
+    .PADDR             	(i_paddr[11:2]),
+    .PWDATA            	(i_pwdata),
+    .PREADY            	(test_slave_pready),
+    .PRDATA            	(test_slave_prdata),   // APB interface outputs
+    .PSLVERR           	(test_slave_pslverr)
   );
   end else
   begin : gen_no_apb_test_slave

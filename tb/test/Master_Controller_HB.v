@@ -61,22 +61,11 @@ module Master_Controller #(
 		for (i = 0; i < REGS_NUM; i = i + 1) begin
 			DATA_MEM[i] = 32'hff000000 + (i<<8);
 		end
+		
 		DATA_MEM[00] = 32'ha55a_5aa5;
-		DATA_MEM[01] = 32'h1111_1111;
-		DATA_MEM[02] = 32'h2222_2222;
-		DATA_MEM[03] = 32'h3333_3333;
-		DATA_MEM[04] = 32'h4444_4444;
-		DATA_MEM[05] = 32'h5555_5555;
-		DATA_MEM[06] = 32'h6666_6666;
-		DATA_MEM[07] = 32'h7777_7777;
-		DATA_MEM[08] = 32'h8888_8888;
-		DATA_MEM[09] = 32'h9999_9999;
-		DATA_MEM[10] = 32'haaaa_aaaa;
-		DATA_MEM[11] = 32'hbbbb_bbbb;
-		DATA_MEM[12] = 32'hcccc_cccc;
-		DATA_MEM[13] = 32'hdddd_dddd;
-		DATA_MEM[14] = 32'heeee_eeee;
-		DATA_MEM[15] = 32'hffff_ffff;
+		for (i = 1; i < 16; i = i + 1) begin
+			DATA_MEM[i] = {8{i[3:0]}};
+		end
 	end
 
 	initial begin
@@ -91,22 +80,10 @@ module Master_Controller #(
 		repeat(10) @(posedge clk);					// 延迟5个时钟周期等待复位完成
 
 		// 基本传输-单拍操作-写数据
-		MC_WRITE_SINGLE(BASEADDR+32'h00, 32'h5aa5_a55a);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h04, 32'h1111_1111);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h08, 32'h2222_2222);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h0c, 32'h3333_3333);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h10, 32'h4444_4444);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h14, 32'h5555_5555);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h18, 32'h6666_6666);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h1c, 32'h7777_7777);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h20, 32'h8888_8888);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h24, 32'h9999_9999);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h28, 32'haaaa_aaaa);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h2c, 32'hbbbb_bbbb);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h30, 32'hcccc_cccc);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h34, 32'hdddd_dddd);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h38, 32'heeee_eeee);	repeat(2) @(posedge clk);
-		MC_WRITE_SINGLE(BASEADDR+32'h3c, 32'hffff_ffff);	repeat(2) @(posedge clk);
+		for (i = 0; i < 16; i = i + 1) begin
+			MC_WRITE_SINGLE(BASEADDR+4*i, DATA_MEM[i]);
+			repeat(2) @(posedge clk);
+		end
 		repeat(10) @(posedge clk);	
 
 		// 基本传输-流水操作-写数据
@@ -118,22 +95,10 @@ module Master_Controller #(
 		repeat(10) @(posedge clk);	
 
 		// 基本传输-单拍操作-读数据
-		MC_READ_SINGLE(BASEADDR+32'h00, 32'h5aa5_a55a);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h04, 32'h1111_1111);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h08, 32'h2222_2222);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h0c, 32'h3333_3333);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h10, 32'h4444_4444);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h14, 32'h5555_5555);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h18, 32'h6666_6666);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h1c, 32'h7777_7777);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h20, 32'h8888_8888);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h24, 32'h9999_9999);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h28, 32'haaaa_aaaa);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h2c, 32'hbbbb_bbbb);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h30, 32'hcccc_cccc);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h34, 32'hdddd_dddd);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h38, 32'heeee_eeee);		repeat(2) @(posedge clk);
-		MC_READ_SINGLE(BASEADDR+32'h3c, 32'hffff_ffff);		repeat(2) @(posedge clk);
+		for (i = 0; i < 16; i = i + 1) begin
+			MC_READ_SINGLE(BASEADDR+4*i, DATA_MEM[i]);
+			repeat(2) @(posedge clk);
+		end
 		repeat(10) @(posedge clk);	
 
 		// 基本传输-流水操作-读数据

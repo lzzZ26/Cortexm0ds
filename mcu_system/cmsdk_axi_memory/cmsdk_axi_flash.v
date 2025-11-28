@@ -49,7 +49,7 @@ module cmsdk_axi_flash #(
   input wire                          R_READY,      // 读数据就绪
   output wire                         R_LAST,       // 读数据最后一个
   output wire  [31:0]                 R_DATA,       // 读数据
-  output wire  [1:0]                  R_RESP        // 读响应
+  output wire  [1:0]                  R_RESP        // 读响应信息
   );
 
 

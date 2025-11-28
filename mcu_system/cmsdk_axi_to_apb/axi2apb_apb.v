@@ -58,7 +58,7 @@ module axi2apb_apb
 	always @(*) begin
 		st_next = st_cur;			// 下面有不完全赋值，这样可以避免LATCH
 		case(st_cur)
-			ST_IDLE: begin
+			ST_IDLE: begin							// IDLE
 				if(BC_WREQ | BC_RREQ)				// 事务启动
 					st_next = ST_SETUP;
 			end
@@ -66,7 +66,7 @@ module axi2apb_apb
 				st_next = ST_ACCESS;
 			end
 			ST_ACCESS: begin						// APB ACCESS
-				if(PREADY)
+				if(PREADY)							// 检查从设备就绪信号
 					st_next = ST_IDLE;
 			end
 			default: st_next = ST_IDLE;				// 防御性编程
@@ -81,9 +81,6 @@ module axi2apb_apb
 		if(!PRESETn)begin
 			PSEL <= 1'b0;
 			PENABLE <= 1'b0;
-			PWRITE <= 1'b0;
-			PADDR <= 'h0;
-			PWDATA <= 'h0;
 		end
 		else begin
 			case(st_next)
@@ -94,15 +91,6 @@ module axi2apb_apb
 				ST_SETUP:begin
 					PSEL <= 1'b1;
 					PENABLE <= 1'b0;
-					if(BC_WREQ) begin				// 写
-						PWRITE <= 1'b1;
-						PADDR <= BC_WADDR;			// 写地址
-						PWDATA <= BC_WDATA;			// 锁存写数据
-					end
-					else if(BC_RREQ)begin			// 读
-						PWRITE <= 1'b0;
-						PADDR <= BC_RADDR;			// 读地址
-					end
 				end
 				ST_ACCESS:begin
 					PSEL <= 1'b1;
@@ -113,6 +101,24 @@ module axi2apb_apb
 					PENABLE <= 1'b0;
 				end
 			endcase
+		end
+	end
+	always @(posedge PCLK or negedge PRESETn)begin
+		if(!PRESETn)begin
+			PWRITE <= 1'b0;
+			PADDR <= 'h0;
+			PWDATA <= 'h0;
+		end
+		else if(st_next == ST_SETUP)begin
+			if(BC_WREQ) begin						// 写
+				PWRITE <= 1'b1;
+				PADDR <= BC_WADDR;					// 写地址
+				PWDATA <= BC_WDATA;					// 锁存写数据
+			end
+			else if(BC_RREQ)begin					// 读
+				PWRITE <= 1'b0;
+				PADDR <= BC_RADDR;					// 读地址
+			end
 		end
 	end
 

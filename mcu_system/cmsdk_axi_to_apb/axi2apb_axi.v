@@ -23,7 +23,7 @@ module axi2apb_axi #(
 	// 写响应通道
 	output 	wire 					B_VALID,		// 写响应有效
 	input 	wire 					B_READY,		// 写响应准备好
-	output 	wire [1:0] 				B_RESP,			// 写响应
+	output 	wire [1:0] 				B_RESP,			// 写响应信息
 	// 读请求通道
 	input   wire 					AR_SEL,			// 读片选
 	input 	wire 					AR_VALID,		// 读请求有效
@@ -37,7 +37,7 @@ module axi2apb_axi #(
 	input 	wire 					R_READY,		// 读数据准备好
 	output  wire					R_LAST,			// 读数据最后一拍
 	output 	wire [DATA_WIDTH-1:0] 	R_DATA,			// 读数据
-	output 	reg [1:0] 				R_RESP,			// 读响应
+	output 	reg [1:0] 				R_RESP,			// 读响应信息
 
 	output wire  APBACTIVE,  // APB bus is active, for clock gating of APB bus
 
@@ -46,12 +46,12 @@ module axi2apb_axi #(
 	input wire						BC_WACK,		// 写应答
 	output reg [ADDR_WIDTH-1:0] 	BC_WADDR,		// 写地址
 	output wire [DATA_WIDTH-1:0] 	BC_WDATA,		// 写数据
-	input wire						BC_WRESP,		// 写响应-错误标志
+	input wire						BC_WRESP,		// 写响应信息
 	output wire						BC_RREQ,		// 读请求
 	input wire						BC_RACK,		// 读应答
 	output reg [ADDR_WIDTH-1:0] 	BC_RADDR,		// 读地址
 	input wire [DATA_WIDTH-1:0]		BC_RDATA,		// 读数据
-	input wire						BC_RRESP		// 读响应-错误标志
+	input wire						BC_RRESP		// 读响应信息
 );
 
 	//---------------------<状态机参数>-------------------------------------

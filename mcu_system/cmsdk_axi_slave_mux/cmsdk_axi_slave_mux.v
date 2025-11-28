@@ -245,7 +245,7 @@ module cmsdk_axi_slave_mux #(
            (awsel_mux_reg[8] & B_VALID8) |
            (awsel_mux_reg[9] & B_VALID9) ;
 
-	assign B_RESP =									// 写响应
+	assign B_RESP =									// 写响应信息
            ({2{(awsel_mux_reg[0])}} & B_RESP0) |
            ({2{(awsel_mux_reg[1])}} & B_RESP1) |
            ({2{(awsel_mux_reg[2])}} & B_RESP2) |
@@ -305,7 +305,7 @@ module cmsdk_axi_slave_mux #(
            ({DW{(arsel_mux_reg[8])}} & R_DATA8) |
            ({DW{(arsel_mux_reg[9])}} & R_DATA9) ;
 
-	assign R_RESP =									// 读响应
+	assign R_RESP =									// 读响应信息
            ({2{(arsel_mux_reg[0])}} & R_RESP0) |
            ({2{(arsel_mux_reg[1])}} & R_RESP1) |
            ({2{(arsel_mux_reg[2])}} & R_RESP2) |

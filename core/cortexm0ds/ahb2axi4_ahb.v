@@ -19,7 +19,7 @@ module ahb2axi4_ahb# (
 	input wire 						HREADY,			// 系统准备好（来自多路器）
 	output reg						HREADYOUT,		// 从设备准备好(送往多路器)
 	output wire[DATA_WIDTH-1:0]		HRDATA,			// 读数据
-	output reg						HRESP,			// 响应
+	output reg						HRESP,			// 响应信息
 
 	// 从设备测试信号
 	output wire						BC_WREQ,		// 请求
@@ -27,12 +27,12 @@ module ahb2axi4_ahb# (
 	input wire						BC_BACK,		// 应答
 	output reg [ADDR_WIDTH-1:0] 	BC_WADDR,		// 写地址缓存
 	output wire [DATA_WIDTH-1:0] 	BC_WDATA,		// 写寄存器缓存
-	input wire						BC_WRESP,		// 错误标志
+	input wire						BC_WRESP,		// 写响应信息
 	output wire						BC_RREQ,		// 请求
 	input wire						BC_RACK,		// 应答
 	output reg [ADDR_WIDTH-1:0] 	BC_RADDR,		// 读地址缓存
 	input wire [DATA_WIDTH-1:0]		BC_RDATA,		// 读寄存器缓存
-	input wire						BC_RRESP		// 错误标志
+	input wire						BC_RRESP		// 读响应信息
 );
 	
 	

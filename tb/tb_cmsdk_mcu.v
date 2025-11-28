@@ -71,7 +71,7 @@ module tb_cmsdk_mcu;
 	/*iverilog */
 	initial
 	begin            
-		$dumpfile("../../../../../../Download/wave2.vcd"); 	// 生成的vcd文件名称
+		$dumpfile("../../../../../Download/wave2.vcd"); 	// 生成的vcd文件名称
 		$dumpvars(0, tb_cmsdk_mcu);    		// testbench模块名称
 	end
 	/*iverilog */
