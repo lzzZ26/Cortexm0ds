@@ -37,7 +37,7 @@ module cmsdk_axi_sram #(
   input wire                          ARESETn,      // Reset
 
   //----------------- AXI - Write -----------------
-  input wire		                  AW_SEL,       // 写片选
+  input wire		                      AW_SEL,       // 写片选
   input wire                          AW_VALID,     // 写请求有效
   output wire                         AW_READY,     // 写请求就绪
   input wire   [2:0]                  AW_SIZE,      // 写数据宽度

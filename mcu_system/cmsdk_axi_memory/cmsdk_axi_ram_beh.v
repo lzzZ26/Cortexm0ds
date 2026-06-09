@@ -139,7 +139,7 @@ module cmsdk_axi_ram_beh #(
 	//--   写请求状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		stwa_next = stwa_cur;		// 下面有不完全赋值，这样可以避免LATCH
+		stwa_next = stwa_cur;		// 默认保持当前状态，避免LATCH
 		case(stwa_cur)
 			STWA_IDLE: begin						// 写请求空闲
 				if(AW_SEL & AW_VALID)               // 写请求
@@ -156,7 +156,7 @@ module cmsdk_axi_ram_beh #(
 						stwa_next = STWA_IDLE;
 				end
 			end
-			default: stwa_next = STWA_IDLE;			// 防御性编程
+			default: stwa_next = STWA_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -228,7 +228,7 @@ module cmsdk_axi_ram_beh #(
 	//--   写数据响应状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		stw_next = stw_cur;			// 下面有不完全赋值，这样可以避免LATCH
+		stw_next = stw_cur;			// 默认保持当前状态，避免LATCH
 		case(stw_cur)
 			STW_IDLE: begin							// 写数据空闲
 				if(AW_SEL & W_VALID)                // 写数据请求
@@ -254,7 +254,7 @@ module cmsdk_axi_ram_beh #(
 						stw_next = STW_IDLE;
 				end
 			end
-			default: stw_next = STW_IDLE;			// 防御性编程
+			default: stw_next = STW_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -275,10 +275,10 @@ module cmsdk_axi_ram_beh #(
 	//--    写数据响应状态机第3段（状态对输出的影响）
 	//----------------------------------------------------------------------
 	// AXI信号产生
-	assign W_READY = (stw_next == STW_DATA) ? 1'b1 : 1'b0;	// 写数据准备好;
+	assign W_READY = (stw_next == STW_DATA) ? 1'b1 : 1'b0;	// 写数据准备好
 
-	assign B_VALID = (stw_next == STW_RESP) ? 1'b1 : 1'b0;	// 写响应准备好
-	assign B_RESP = 2'b00;							// OKAY	
+	assign B_VALID = (stw_next == STW_RESP) ? 1'b1 : 1'b0;	// 写响应有效
+	assign B_RESP = 2'b00;							// 输出写响应信息：OKAY	
 
 	// RF数据信号产生
     // Generate write control (address phase)
@@ -290,7 +290,7 @@ module cmsdk_axi_ram_beh #(
 			RF_WREQ <= 1'b0;
 		end
 		else begin
-			RF_WREQ <= W_VALID & W_READY;
+			RF_WREQ <= W_VALID & W_READY;           // RF写请求有效
 		end
 	end
 
@@ -310,7 +310,7 @@ module cmsdk_axi_ram_beh #(
 			RF_RACK_d1 <= 1'b0;
 		end
 		else begin
-			RF_RACK_d1 <= RF_RACK;                 // 延迟一拍
+			RF_RACK_d1 <= RF_RACK;                  // 延迟一拍
 		end
 	end
 
@@ -352,7 +352,7 @@ module cmsdk_axi_ram_beh #(
 			STR_BURST: begin						// BURST读
 				str_next = STR_DATA;
 			end
-			default: str_next = STR_IDLE;			// 防御性编程
+			default: str_next = STR_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -375,10 +375,10 @@ module cmsdk_axi_ram_beh #(
 	// AXI信号产生
 	assign AR_READY = (str_next == STR_REQ) ? 1'b1 : 1'b0; 	// 读请求准备好
 
-	assign R_VALID = RF_RACK;
+	assign R_VALID = RF_RACK;                       // 读数据有效
 	assign R_LAST = R_VALID & R_READY & (r_beatCNT == AR_LEN);	// 最后一拍数据
-	assign R_DATA = RF_RDATA;                   	// 采样数据
-	assign R_RESP = 2'b00; 							// OKAY
+	assign R_DATA = RF_RDATA;                   	// 输出读数据
+	assign R_RESP = 2'b00; 							// 输出读响应信息：OKAY
 
 	// RF信号产生
     // BURST读操作计算下一拍地址
@@ -399,7 +399,7 @@ module cmsdk_axi_ram_beh #(
     assign RF_RAREQ = AR_SEL & AR_VALID & AR_READY & (~RF_WREQ);  // 读写数据时互斥操作
  
     // Generate read enable (data and respone phase)
-    assign RF_RREQ  = R_READY;
+    assign RF_RREQ  = R_READY;                      // RF读请求有效
 
     // 读字节选通 (address phase, Registering read strobe signals to data phase)
     always @(posedge ACLK or negedge ARESETn)
@@ -484,7 +484,7 @@ module cmsdk_axi_ram_beh #(
     begin
         for(i=0; i<(1<<AW); i=i+1)
         begin
-            ram_data[i] = 8'h00; //Initialize all data to 0
+            ram_data[i] = 8'h00;                    //Initialize all data to 0
         end
         if(filename != "")
         begin
@@ -514,7 +514,7 @@ module cmsdk_axi_ram_beh #(
         end
     end
 
-    assign RF_WACK = RF_WREQ;
+    assign RF_WACK = RF_WREQ;                       // Write acknowledge
     //assign RF_WACK = RF_WREQ & (write_waitstate_cnt == 0);
 
     // Write wait state control
@@ -565,9 +565,9 @@ module cmsdk_axi_ram_beh #(
 		else
 			rdata_out_3 = 8'h00;
 
-	assign RF_RDATA = {rdata_out_3, rdata_out_2, rdata_out_1,rdata_out_0};    // 采样数据
+	assign RF_RDATA = {rdata_out_3, rdata_out_2, rdata_out_1,rdata_out_0};    // 读数据
 
-    assign RF_RACK = RF_RREQ & (read_waitstate_cnt == 0);
+    assign RF_RACK = RF_RREQ & (read_waitstate_cnt == 0);   // 读应答
 
     // Read wait state control
     assign read_waitstate_cnt_next = (RF_RAREQ) ?

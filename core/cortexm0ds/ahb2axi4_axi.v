@@ -23,7 +23,7 @@ module ahb2axi4_axi #(
     // 写响应通道                                
 	input wire						B_VALID,		// 写响应有效
 	output wire  					B_READY,		// 写响应就绪
-	input wire [1:0] 				B_RESP,         // 写响应
+	input wire [1:0] 				B_RESP,         // 写响应信息
     // 读请求通道                                
 	output wire  					AR_VALID,		// 读请求有效
 	input wire						AR_READY,		// 读请求就绪
@@ -105,7 +105,7 @@ module ahb2axi4_axi #(
 	//--  写请求状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		stwa_next = stwa_cur;		// 下面有不完全赋值，这样可以避免LATCH
+		stwa_next = stwa_cur;		// 默认保持当前状态，避免LATCH
 		case(stwa_cur)
 			STWA_IDLE: begin						// 写请求空闲
 				if(BC_WREQ)
@@ -124,7 +124,7 @@ module ahb2axi4_axi #(
 						stwa_next = STWA_IDLE;
 				end
 			end
-			default: stwa_next = STWA_IDLE;			// 防御性编程
+			default: stwa_next = STWA_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -136,7 +136,7 @@ module ahb2axi4_axi #(
 	assign AW_SIZE  = BC_WSIZE;
 	assign AW_BURST = BC_WBURST;
 	assign AW_LEN   = BC_WLEN;
-	assign AW_ADDR  = BC_WADDR;						// BC已经寄存
+	assign AW_ADDR  = BC_WADDR;						// 输出写地址，BC已经寄存
 
 	//----------------------------------------------------------------------
 	//--   写数据响应状态机第1段（状态迁移）
@@ -154,7 +154,7 @@ module ahb2axi4_axi #(
 	//--   写数据响应状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		stw_next = stw_cur;			// 下面有不完全赋值，这样可以避免LATCH
+		stw_next = stw_cur;			// 默认保持当前状态，避免LATCH
 		case(stw_cur)
 			STW_IDLE: begin
 				if(BC_WREQ)							// 写操作启动
@@ -179,7 +179,7 @@ module ahb2axi4_axi #(
 						stw_next = STW_IDLE;
 				end
 			end
-			default: stw_next = STW_IDLE;			// 防御性编程
+			default: stw_next = STW_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 	
@@ -209,7 +209,7 @@ module ahb2axi4_axi #(
 	// BC信号产生
 	assign BC_WACK  = W_VALID & W_READY;
 	assign BC_BACK  = B_VALID & B_READY;
-	assign BC_WRESP = (stw_cur == STW_RESP) & B_VALID & B_RESP[1];	// 写出错
+	assign BC_WRESP = (stw_cur == STW_RESP) & B_VALID & B_RESP[1];	// BC写响应信息
 
 
 	//############################# 读操作 #################################
@@ -252,7 +252,7 @@ module ahb2axi4_axi #(
 			STR_BURST: begin						// BURST读
 				str_next = STR_DATA;
 			end
-			default: str_next = STR_IDLE;			// 防御性编程
+			default: str_next = STR_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 	
@@ -283,7 +283,7 @@ module ahb2axi4_axi #(
 
 	// BC信号产生
 	assign BC_RACK = R_VALID & R_READY;				// 读准备好
-	assign BC_RDATA = R_DATA;						// 采样数据
-	assign BC_RRESP = (str_cur == STR_DATA) & R_VALID & R_RESP[1];		// 读出错
+	assign BC_RDATA = R_DATA;						// 采样读数据
+	assign BC_RRESP = (str_cur == STR_DATA) & R_VALID & R_RESP[1];		// 采样读响应信息
 
 endmodule

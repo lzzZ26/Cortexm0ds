@@ -23,7 +23,7 @@ module axi2apb_axi #(
 	// 写响应通道
 	output 	wire 					B_VALID,		// 写响应有效
 	input 	wire 					B_READY,		// 写响应准备好
-	output 	wire [1:0] 				B_RESP,			// 写响应信息
+	output 	wire [1:0] 				B_RESP,			// 写响应
 	// 读请求通道
 	input   wire 					AR_SEL,			// 读片选
 	input 	wire 					AR_VALID,		// 读请求有效
@@ -101,7 +101,7 @@ module axi2apb_axi #(
 	//--   写请求状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		stwa_next = stwa_cur;		// 下面有不完全赋值，这样可以避免LATCH
+		stwa_next = stwa_cur;		// 默认保持当前状态，避免LATCH
 		case(stwa_cur)
 			STWA_IDLE: begin						// 写请求空闲
 				if(AW_SEL & AW_VALID)				// 写请求
@@ -118,7 +118,7 @@ module axi2apb_axi #(
 						stwa_next = STWA_IDLE;
 				end
 			end
-			default: stwa_next = STWA_IDLE;			// 防御性编程
+			default: stwa_next = STWA_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -158,7 +158,7 @@ module axi2apb_axi #(
 	//--   写数据响应状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		stw_next = stw_cur;			// 下面有不完全赋值，这样可以避免LATCH
+		stw_next = stw_cur;			// 默认保持当前状态，避免LATCH
 		case(stw_cur)
 			STW_IDLE: begin							// 写数据空闲
 				if(AW_SEL & W_VALID)				// 写数据请求
@@ -184,7 +184,7 @@ module axi2apb_axi #(
 						stw_next = STW_IDLE;
 				end
 			end
-			default: stw_next = STW_IDLE;			// 防御性编程
+			default: stw_next = STW_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -205,15 +205,14 @@ module axi2apb_axi #(
 	//--    写数据响应状态机第3段（状态对输出的影响）
 	//----------------------------------------------------------------------
 	// AXI信号产生
-	assign W_READY = BC_WACK;
+	assign W_READY = BC_WACK;						// 写数据就绪
 
-	assign B_VALID = (stw_cur == STW_RESP) ? 1'b1 : 1'b0;	// 写响应准备好
-	assign B_RESP = {BC_WRESP, 1'b0};
+	assign B_VALID = (stw_cur == STW_RESP) ? 1'b1 : 1'b0;	// 写响应有效
+	assign B_RESP = {BC_WRESP, 1'b0};				// 输出写响应信息
 
 	// BC数据信号产生
-	//assign BC_WREQ = (stw_cur == STW_DATA) ? 1'b1 : 1'b0;
-	assign BC_WREQ = (stw_next == STW_DATA) || (stw_cur == STW_DATA);
-	assign BC_WDATA = W_DATA;						// 写数据
+	assign BC_WREQ = (stw_next == STW_DATA) || (stw_cur == STW_DATA);	// BC写请求
+	assign BC_WDATA = W_DATA;						// 采样写数据
 
 
 	//############################# 读操作 #################################
@@ -270,7 +269,7 @@ module axi2apb_axi #(
 				else								// 单拍非流水或者BURST最后一拍
 					str_next = STR_IDLE;
 			end
-			default: str_next = STR_IDLE;			// 防御性编程
+			default: str_next = STR_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -293,22 +292,21 @@ module axi2apb_axi #(
 	// AXI信号产生
 	assign AR_READY = (str_next == STR_REQ) ? 1'b1 : 1'b0;	// 读请求准备好
 
-	assign R_VALID = BC_RREQ & BC_RACK;
+	assign R_VALID = BC_RREQ & BC_RACK;				// 读数据有效
 	assign R_LAST = R_VALID & R_READY & (r_beatCNT == AR_LEN);	// 最后一拍数据
-	assign R_DATA = BC_RDATA;						// 采样数据
+	assign R_DATA = BC_RDATA;						// 输出读数据
 
 	always @(posedge ACLK or negedge ARESETn) begin
 		if(!ARESETn) begin
 			R_RESP <= 2'b00;
 		end
 		else if(str_next == STR_BURST)begin
-			R_RESP[1] <= BC_RRESP;
+			R_RESP[1] <= BC_RRESP;					// 输出读响应信息
 		end
 	end
 
 	// BC信号产生
-	//assign BC_RREQ = (str_next == STR_DATA) ? 1'b1 : 1'b0;
-	assign BC_RREQ = (str_next == STR_REQ) || (str_next == STR_DATA) ;
+	assign BC_RREQ = (str_next == STR_REQ) || (str_next == STR_DATA) ;	// BC读请求
 
 	always @(*) begin
 		if(str_next == STR_IDLE) begin

@@ -212,12 +212,12 @@ module cmsdk_axi_sysrom_table
 	//--   状态机第3段（状态对输出的影响）
 	//----------------------------------------------------------------------
 	// AXI信号产生
-	assign AR_READY = (str_next == STR_REQ) ? 1'b1 : 1'b0;    	// 读请求准备好
+	assign AR_READY = (str_next == STR_REQ) ? 1'b1 : 1'b0; 	// 读请求准备好
 
-	assign R_VALID = RF_RACK;
+	assign R_VALID = RF_RACK;                       // 读数据有效 
 	assign R_LAST = R_VALID & R_READY & (r_beatCNT == AR_LEN);	// 最后一拍数据
-	assign R_DATA = RF_RDATA;                       // 采样数据
-	assign R_RESP = 2'b00;                          // OKAY
+	assign R_DATA = RF_RDATA;                       // 输出读数据
+	assign R_RESP = 2'b00;                          // 输出读响应信息：OKAY
 
 	// RF信号产生
     // BURST读操作计算下一拍地址

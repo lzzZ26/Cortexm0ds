@@ -92,12 +92,13 @@ module cortexm0ds (
 	wire [2:0]	        MC_SIZE;	    // 数据宽度
 	wire [2:0]	        MC_BURST;	    // burst类型
 	wire 		        MC_REQ;		    // 请求信号
- 	wire 		        MC_ACK;		    // 应答信号
+ 	wire 				MC_AACK;		// 地址段应答信号（地址段最后一个周期）
+ 	wire 				MC_DACK;		// 数据段应答信号（数据段最后一个周期）
 	wire 		        MC_W_R;		    // 写读信号
 	wire [31:0]         MC_ADDR;	    // 地址
 	wire [31:0]         MC_WDATA;	    // 写数据
 	wire [31:0]         MC_RDATA;	    // 读数据
-	wire	 	        MC_RESP;	    // 错误标志
+	wire	 	        MC_RESP;	    // 响应信息
 
     // ------------------------------------------------------------
 	parameter integer ADDR_WIDTH = 32;	// 地址宽度
@@ -126,7 +127,8 @@ module cortexm0ds (
 			.MC_SIZE	(MC_SIZE),	
 			.MC_BURST	(MC_BURST),	
 			.MC_REQ		(MC_REQ),
-			.MC_ACK		(MC_WCK),
+			.MC_AACK	(MC_AACK),
+			.MC_DACK	(MC_DACK),
 			.MC_W_R		(MC_W_R),
 			.MC_ADDR	(MC_ADDR),
 			.MC_WDATA	(MC_WDATA),	
@@ -155,7 +157,8 @@ module cortexm0ds (
 			.MC_SIZE	(MC_SIZE),
 			.MC_BURST	(MC_BURST),
 			.MC_REQ		(MC_REQ),
-			.MC_ACK		(MC_WCK),
+			.MC_AACK	(MC_AACK),
+			.MC_DACK	(MC_DACK),
 			.MC_W_R		(MC_W_R),
 			.MC_ADDR	(MC_ADDR),
 			.MC_WDATA	(MC_WDATA),

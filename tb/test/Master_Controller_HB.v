@@ -4,8 +4,10 @@
 // CLK      __|  |__|  |__|  |__|  |__|  |__|  |__|  |__|  |__
 //             _____
 // MC_REQ   __|     |_________________________________________
-//             _____       _____
-// MC_ACK   __|     |_____|     |_____________________________
+//             _____       
+// MC_AACK  __|     |_________________________________________
+//                         _____
+// MC_DACK  ______________|     |_____________________________
 //            _______
 // MC_ADDR  XX___A___XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 //                   ___________
@@ -34,12 +36,13 @@ module Master_Controller #(
 	output reg [2:0]				MC_SIZE,		// 数据宽度
 	output reg [2:0]				MC_BURST,		// burst类型
     output reg  					MC_REQ,			// 请求信号
- 	input  wire						MC_ACK,			// 应答信号
+ 	input wire						MC_AACK,		// 地址段应答信号（地址段最后一个周期）
+ 	input wire						MC_DACK,		// 数据段应答信号（数据段最后一个周期）
     output reg  					MC_W_R,			// 写读信号
     output reg [ADDR_WIDTH-1:0]		MC_ADDR,		// 地址
     output reg [DATA_WIDTH-1:0]		MC_WDATA,		// 写数据
     input wire [DATA_WIDTH-1:0]		MC_RDATA,		// 读数据
-	input wire  		 			MC_RESP			// 错误标志 
+	input wire  		 			MC_RESP			// 响应信息 
 );
 
 	localparam BASEADDR_Flash   = 32'h0000_0000;	// Flash起始地址，64KB
@@ -77,7 +80,8 @@ module Master_Controller #(
 		MC_ADDR = 'h04;
 		MC_WDATA = 'h0;
 
-		repeat(10) @(posedge clk);					// 延迟5个时钟周期等待复位完成
+		wait(rst_n == 1);							// 等待复位完成
+		repeat(2) @(posedge clk);
 
 		// 基本传输-单拍操作-写数据
 		for (i = 0; i < 16; i = i + 1) begin
@@ -111,13 +115,15 @@ module Master_Controller #(
 
 		// 基本传输-流水操作-写_读数据
 		MC_W_R_FLOW;
-		repeat(10) @(posedge clk);	
 
+		repeat(10) @(posedge clk);	
+		$display("########### Test Completed!!! ##########");
 		$finish;
 	end
 
 
 	//----------------------------------------------------------------------
+	// Task采用非阻塞赋值，已经明确输出信号在时钟边沿之后发生变化
 	//----------------------------------------------------------------------
 	task MC_WRITE_SINGLE;	// 基本传输-单拍操作-写数据
 	input [ADDR_WIDTH-1:0] 	t_addr;
@@ -238,8 +244,8 @@ module Master_Controller #(
 		MC_BURST <= burst;							// burst类型
 		MC_SIZE <= `BYTE_4;							// 宽度为32bit
 		MC_W_R <= 1'b1;
-		#1 wait(MC_ACK == 1);
-		@(posedge clk);								// 插入等待周期
+		#1 wait(MC_AACK);							// 等待地址段应答，必须电平方式
+		@(posedge clk);								// 延迟一个时钟周期
 		MC_TRANS <= `IDLE;							// 单拍传输模式
 		MC_REQ <= 1'b0;								// 写请求结束
 	end
@@ -251,8 +257,8 @@ module Master_Controller #(
 	begin
 		$display("MC_WRITE---addr: %h; wdata: %h", t_addr, w_data);
 		MC_WDATA <= w_data;
-		#1 wait(MC_ACK == 1);
-		@(posedge clk);								// 插入等待周期
+		#1 wait(MC_DACK);							// 等待数据段应答，必须电平方式
+		@(posedge clk);								// 延迟一个时钟周期
 	end
 	endtask
 
@@ -267,8 +273,8 @@ module Master_Controller #(
 		MC_BURST <= burst;							// burst类型
 		MC_SIZE <= `BYTE_4;							// 宽度为32bit
 		MC_W_R <= 1'b0;
-		#1 wait(MC_ACK == 1);
-		@(posedge clk);								// 插入等待周期
+		#1 wait(MC_AACK);							// 等待地址段应答，必须电平方式
+		@(posedge clk);								// 延迟一个时钟周期
 		MC_TRANS <= `IDLE;							// 单拍传输模式
 		MC_REQ <= 1'b0;								// 读请求结束
 	end
@@ -276,12 +282,12 @@ module Master_Controller #(
 
 	task MC_READ_DATA;		// 读数据段
 	input [ADDR_WIDTH-1:0] 	t_addr;
-	input [DATA_WIDTH-1:0] 	w_data;
-	reg [DATA_WIDTH-1:0] 	r_data;
+	input [DATA_WIDTH-1:0] 	w_data;					// 用于比较的值
+	reg [DATA_WIDTH-1:0] r_data;					// 读回的数据
 	begin
-		assign r_data = MC_RDATA;
-		#1 wait(MC_ACK == 1);
-		@(posedge clk);								// 插入等待周期
+		#1 wait(MC_DACK);							// 等待数据段应答，必须电平方式
+		@(posedge clk);								// 延迟一个时钟周期
+		r_data = MC_RDATA;							// 采样读数据，要求阻塞赋值
 		if(r_data == w_data)						// 比较数据
 			$display("MC_READ OK----addr: %h; rdata: %h; wdata: %h", t_addr, r_data, w_data);
 		else

@@ -85,7 +85,6 @@ module cmsdk_axi_addr_decode #(
   // ----------------------------------------------------------
   // Memory decode logic
   // ----------------------------------------------------------
-
   // If Boot loader is not present (BOOT_LOADER_PRESENT==0),
   // boot_arsel always 0.
   // Otherwise select if address = 0x0100xxxx or when remap_ctrl
@@ -107,7 +106,6 @@ module cmsdk_axi_addr_decode #(
   // ----------------------------------------------------------
   // Peripheral Selection decode logic
   // ----------------------------------------------------------
-
   assign apbsys_awsel  = (w_addr[31:16]==16'h4000) ? 1'b1 : 1'b0;                    // 0x40000000
   assign apbsys_arsel  = (r_addr[31:16]==16'h4000) ? 1'b1 : 1'b0;                    // 0x40000000
   assign gpio0_awsel   = (w_addr[31:12]==BASEADDR_GPIO0[31:12]) ? 1'b1 : 1'b0;       // 0x40010000
@@ -123,13 +121,12 @@ module cmsdk_axi_addr_decode #(
   // ----------------------------------------------------------
   // Default slave decode logic
   // ----------------------------------------------------------
-
-  assign defslv_awsel = ~(sram_awsel   |
+  assign defslv_awsel = ~(sram_awsel   |                // 缺省设备写片选
                           apbsys_awsel |
                           gpio0_awsel  |
                           gpio1_awsel  |//uart4_awsel |
                           sysctrl_awsel);
-  assign defslv_arsel  = ~(boot_arsel  | flash_arsel  |
+  assign defslv_arsel  = ~(boot_arsel  | flash_arsel  | // 缺省设备读片选
                           sram_arsel   |
                           apbsys_arsel |
                           gpio0_arsel  |

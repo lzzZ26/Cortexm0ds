@@ -75,7 +75,7 @@ module cmsdk_axi2apb_subsystem #(
     input  wire                     W_VALID,        // Write data valid
     output wire                     W_READY,        // Write data ready
     input  wire                     W_LAST,         // Write data last
-    input  wire [31:0]  	        W_DATA,         // Write data
+    input  wire [31:0]  	          W_DATA,         // Write data
     output wire                     B_VALID,        // Write response valid
     input  wire                     B_READY,        // Write response ready
     output wire [ 1:0]              B_RESP,         // Write response

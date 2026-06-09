@@ -24,12 +24,13 @@ module AHB_Lite_Master_IF #(
 	input wire [2:0] 				MC_SIZE,		// 数据宽度
 	input wire [2:0] 				MC_BURST,		// burst类型
     input wire						MC_REQ,			// 请求信号
- 	output wire						MC_ACK,			// 应答信号（数据段最后一个周期）
+ 	output wire						MC_AACK,		// 地址段应答信号（地址段最后一个周期）
+ 	output wire						MC_DACK,		// 数据段应答信号（数据段最后一个周期）
 	input wire						MC_W_R,			// 写读信号
     input wire[ADDR_WIDTH-1:0]		MC_ADDR,		// 地址
     input wire[DATA_WIDTH-1:0]		MC_WDATA,		// 写数据
     output wire[DATA_WIDTH-1:0]		MC_RDATA,		// 读数据
-    output wire	 					MC_RESP			// 错误标志 
+    output wire	 					MC_RESP			// 响应信息 
 );
 	
 	//---------------------<状态机参数>-------------------------------------
@@ -67,7 +68,7 @@ module AHB_Lite_Master_IF #(
 	//--   状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		sta_next = sta_cur;			// 下面有不完全赋值，这样可以避免LATCH
+		sta_next = sta_cur;			// 默认保持当前状态，避免LATCH
 		case(sta_cur)
 			STA_IDLE: begin							// 空闲
 				if(MC_REQ)begin						// 事务启动
@@ -78,7 +79,7 @@ module AHB_Lite_Master_IF #(
 				if(!MC_REQ)							// BURST传输完毕
 					sta_next = STA_IDLE;
 			end
-			default: sta_next = STA_IDLE;			// 防御性编程
+			default: sta_next = STA_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -86,11 +87,11 @@ module AHB_Lite_Master_IF #(
 	//--   状态机第3段（状态对输出的影响）
 	//----------------------------------------------------------------------
 	// AHB信号产生
-	assign HTRANS = MC_TRANS;
+	assign HTRANS = MC_TRANS;						// 输出事务
 	assign HSIZE  = MC_SIZE;
 	assign HBURST = MC_BURST;
 	assign HWRITE = MC_W_R; 						// 写
-	assign HADDR  = MC_ADDR;
+	assign HADDR  = MC_ADDR;						// 输出地址
 
 	// 地址段到数据段同步信号产生
 	assign dataREQ = MC_REQ;
@@ -112,7 +113,7 @@ module AHB_Lite_Master_IF #(
 	//--   状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		std_next = std_cur;			// 下面有不完全赋值，这样可以避免LATCH
+		std_next = std_cur;			// 默认保持当前状态，避免LATCH
 		case(std_cur)
 			STD_IDLE: begin							// 空闲
 				if(dataREQ)
@@ -122,7 +123,7 @@ module AHB_Lite_Master_IF #(
 				if (HREADY & (!dataREQ))			// 传输完毕
 					std_next = STD_IDLE;
 			end
-			default: std_next = STD_IDLE;			// 防御性编程
+			default: std_next = STD_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -130,11 +131,12 @@ module AHB_Lite_Master_IF #(
 	//--   状态机第3段（状态对输出的影响）
 	//----------------------------------------------------------------------
 	// AHB信号产生
-	assign HWDATA = MC_WDATA;
+	assign HWDATA = MC_WDATA;						// 输出写数据
 
 	// MC信号产生
-	assign MC_ACK  = ((sta_next == STA_ADDR) | (std_cur == STD_DATA)) & HREADY;
-	assign MC_RDATA = HRDATA;						// 采样数据
-	assign MC_RESP = HRESP;							// 出错
+	assign MC_AACK  = (sta_next == STA_ADDR) & HREADY;	// MC地址段应答
+	assign MC_DACK  = (std_cur == STD_DATA) & HREADY;	// MC数据段应答
+	assign MC_RDATA = HRDATA;						// 采样读数据
+	assign MC_RESP = HRESP;							// 采样响应信息
 
 endmodule

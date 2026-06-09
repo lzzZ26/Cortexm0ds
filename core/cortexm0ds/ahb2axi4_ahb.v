@@ -70,7 +70,7 @@ module ahb2axi4_ahb# (
 	//--   状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		sta_next = sta_cur;			// 下面有不完全赋值，这样可以避免LATCH
+		sta_next = sta_cur;			// 默认保持当前状态，避免LATCH
 		case(sta_cur)
 			STA_IDLE: begin							// 空闲
 				if((HSEL & HREADY) && (HTRANS == `NONSEQ))begin	// 事务启动
@@ -82,7 +82,7 @@ module ahb2axi4_ahb# (
 					sta_next = STA_IDLE;
 				end
 			end
-			default: sta_next = STA_IDLE;			// 防御性编程
+			default: sta_next = STA_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -125,7 +125,7 @@ module ahb2axi4_ahb# (
 	//--   状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		std_next = std_cur;			// 下面有不完全赋值，这样可以避免LATCH
+		std_next = std_cur;			// 默认保持当前状态，避免LATCH
 		case(std_cur)
 			STD_IDLE: begin							// 空闲
 				if(w_dataREQ)
@@ -159,7 +159,7 @@ module ahb2axi4_ahb# (
 						std_next = STD_IDLE;
 				end
 			end
-			default: std_next = STD_IDLE;			// 防御性编程
+			default: std_next = STD_IDLE;			// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -182,32 +182,32 @@ module ahb2axi4_ahb# (
 			HREADYOUT <= 1'b1;
 		end
 		else if(std_cur == STD_WDATA) begin
-			HREADYOUT <= BC_WACK_reg;
+			HREADYOUT <= BC_WACK_reg;				// 写数据完成
 		end
 		else if(std_cur == STD_RDATA) begin
-			HREADYOUT <= BC_RACK;
+			HREADYOUT <= BC_RACK;					// 读数据完成
 		end
 		else begin
-			HREADYOUT <= 1'b1;						// 防御性编程
+			HREADYOUT <= 1'b1;						// 防御性编程：异常状态恢复
 		end
 	end
 
-	assign HRDATA = BC_RDATA; 						// 采样读数据
+	assign HRDATA = BC_RDATA; 						// 输出读数据
 	always @(posedge HCLK or negedge HRESETn)begin
 		if(!HRESETn)begin
 			HRESP <= 1'b0;
 		end
 		else if((std_next == STD_WRESP) & BC_BACK) begin
-			HRESP <= BC_WRESP; 						// 采样响应信息
+			HRESP <= BC_WRESP; 						// 输出写响应信息
 		end
 		else if((std_cur == STD_RDATA) & BC_RACK) begin
-			HRESP <= BC_RRESP; 						// 采样响应信息
+			HRESP <= BC_RRESP; 						// 输出读响应信息
 		end
 	end
 
 	//BC数据信号产生
-	assign BC_WREQ = HSEL & HREADY & (HTRANS[1] == 1'b1) & HWRITE;
-	assign BC_RREQ = HSEL & HREADY & (HTRANS[1] == 1'b1) & (~HWRITE);
+	assign BC_WREQ = HSEL & HREADY & (HTRANS[1] == 1'b1) & HWRITE;		// BC写请求
+	assign BC_RREQ = HSEL & HREADY & (HTRANS[1] == 1'b1) & (~HWRITE);	// BC读请求
 	assign BC_WDATA = HWDATA;						// 采样写数据
 
 endmodule

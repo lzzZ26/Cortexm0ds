@@ -148,19 +148,19 @@ localparam  ARM_CMSDK_CM0_SYSCTRL_CID3 = {32'h000000B1}; // 0xFFC : CID 3
   // ----------------------------------------------------------
   // AXI写操作接口
   // ----------------------------------------------------------
-  assign AW_READY = 1'b1;
-  assign W_READY = 1'b1;
-  assign B_VALID = 1'b1;
-  assign B_RESP = 2'b00;      // OKAY
+  assign AW_READY = 1'b1;                           // Write address ready
+  assign W_READY = 1'b1;                            // Write data ready
+  assign B_VALID = 1'b1;                            // Write response valid
+  assign B_RESP = 2'b00;                            // 输出写响应信息：OKAY
 
   // ----------------------------------------------------------
   // AXI读操作接口
   // ----------------------------------------------------------
-  assign AR_READY = 1'b1;
-  assign R_VALID  = 1'b1;
-  assign R_LAST   = 1'b1;
-  assign R_DATA   = read_mux;
-  assign R_RESP   = 2'b00;    // OKAY
+  assign AR_READY = 1'b1;                           // Read address ready
+  assign R_VALID  = 1'b1;                           // Read response valid
+  assign R_LAST   = 1'b1;                           // Read data last
+  assign R_DATA   = read_mux;                       // 输出读数据
+  assign R_RESP   = 2'b00;                          // 输出读响应信息：OKAY
 
   // ----------------------------------------------------------
   // Write/read control logic

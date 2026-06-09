@@ -54,7 +54,7 @@ module axi2apb_if
     input  wire                     R_READY,		// 读数据准备好
     output wire                     R_LAST,			// 读数据最后一条
     output wire [DATA_WIDTH-1:0]  	R_DATA,			// 读数据
-    output wire [ 1:0]              R_RESP,			// 读响应信息
+    output wire [ 1:0]              R_RESP,			// 读响应
 
     //-----------------------------------------------------------
 	output wire  APBACTIVE,  // APB bus is active, for clock gating of APB bus

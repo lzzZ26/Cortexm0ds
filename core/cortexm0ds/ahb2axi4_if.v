@@ -65,8 +65,8 @@ module ahb2axi4_if #(
     output wire   [ADDR_WIDTH-1:0]      AR_ADDR,
     input  wire                         R_VALID,
     output wire                         R_READY,
-    input  wire                         R_LAST,
-    input  wire   [DATA_WIDTH-1:0]      R_DATA,
+     input  wire                         R_LAST,
+   input  wire   [DATA_WIDTH-1:0]      R_DATA,
     input  wire   [1:0]                 R_RESP
 );
 

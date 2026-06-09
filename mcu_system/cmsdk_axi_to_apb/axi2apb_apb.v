@@ -56,7 +56,7 @@ module axi2apb_apb
 	//--   状态机第2段（输入对状态的影响）
 	//----------------------------------------------------------------------
 	always @(*) begin
-		st_next = st_cur;			// 下面有不完全赋值，这样可以避免LATCH
+		st_next = st_cur;			// 默认保持当前状态，避免LATCH
 		case(st_cur)
 			ST_IDLE: begin							// IDLE
 				if(BC_WREQ | BC_RREQ)				// 事务启动
@@ -69,7 +69,7 @@ module axi2apb_apb
 				if(PREADY)							// 检查从设备就绪信号
 					st_next = ST_IDLE;
 			end
-			default: st_next = ST_IDLE;				// 防御性编程
+			default: st_next = ST_IDLE;				// 防御性编程：异常状态恢复
 		endcase
 	end
 
@@ -89,14 +89,14 @@ module axi2apb_apb
 					PENABLE <= 1'b0;
 				end
 				ST_SETUP:begin
-					PSEL <= 1'b1;
+					PSEL <= 1'b1;					// 片选有效
 					PENABLE <= 1'b0;
 				end
 				ST_ACCESS:begin
 					PSEL <= 1'b1;
-					PENABLE <= 1'b1;
+					PENABLE <= 1'b1;				// 主设备有效
 				end
-				default:begin						// 防御性编程
+				default:begin						// 防御性编程：异常状态恢复
 					PSEL <= 1'b0;
 					PENABLE <= 1'b0;
 				end
@@ -112,21 +112,21 @@ module axi2apb_apb
 		else if(st_next == ST_SETUP)begin
 			if(BC_WREQ) begin						// 写
 				PWRITE <= 1'b1;
-				PADDR <= BC_WADDR;					// 写地址
-				PWDATA <= BC_WDATA;					// 锁存写数据
+				PADDR <= BC_WADDR;					// 输出写地址
+				PWDATA <= BC_WDATA;					// 输出写数据
 			end
 			else if(BC_RREQ)begin					// 读
 				PWRITE <= 1'b0;
-				PADDR <= BC_RADDR;					// 读地址
+				PADDR <= BC_RADDR;					// 输出读地址
 			end
 		end
 	end
 
 	// BC信号产生
-	assign BC_WACK  = BC_WREQ & (st_cur == ST_ACCESS) & PREADY;// 准备好
-	assign BC_WRESP = PSLVERR;						// 出错
-	assign BC_RACK  = BC_RREQ & (st_cur == ST_ACCESS) & PREADY;// 准备好
-	assign BC_RDATA = PRDATA;						// 采样数据
-	assign BC_RRESP = PSLVERR;						// 出错
+	assign BC_WACK  = BC_WREQ & (st_cur == ST_ACCESS) & PREADY;		// BC写应答
+	assign BC_WRESP = PSLVERR;						// 采样写响应信息
+	assign BC_RACK  = BC_RREQ & (st_cur == ST_ACCESS) & PREADY;		// BC读应答
+	assign BC_RDATA = PRDATA;						// 采样读数据
+	assign BC_RRESP = PSLVERR;						// 采样读响应信息
 
 endmodule

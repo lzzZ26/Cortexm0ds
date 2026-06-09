@@ -27,10 +27,10 @@
 `include "cmsdk_axi_memory_defs.v"
 
 module cmsdk_axi_flash #(
- parameter filename = "",		                    // 测试程序（二进制指令代码）
- parameter AW       = 16,		                    // Address width
- parameter WS_N     = 0,		                    // First access wait state
- parameter WS_S     = 0			                    // Subsequent access wait state
+ parameter filename = "",		                        // 测试程序（二进制指令代码）
+ parameter AW       = 16,		                        // Address width
+ parameter WS_N     = 0,		                        // First access wait state
+ parameter WS_S     = 0			                        // Subsequent access wait state
  )
  (
   input wire                          ACLK,         // Clock
