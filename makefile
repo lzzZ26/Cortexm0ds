@@ -67,7 +67,7 @@
 	ElfFile = run.out
 	
 # wave File's name(.vcd .gtkw)
-	VcdFile = ../../../../../Download/wave2.vcd
+	VcdFile = wave2.vcd
 	GtkwFile = signal.gtkw
 	
 ################################################################

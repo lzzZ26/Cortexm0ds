@@ -1,0 +1,45 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Cortexm0ds\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\Cortexm0ds\\software\\cmsis\\Device\\ARM\\CMSDK_CM0\\Source\\system_CMSDK_CM0.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:software\\cmsis\\Device\\ARM\\CMSDK_CM0\\Source\\system_CMSDK_CM0.c||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{c3d4e5f6-a7b8-9012-cdef-ab3456789012}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "system_CMSDK_CM0.c",
+              "DocumentMoniker": "D:\\Cortexm0ds\\software\\cmsis\\Device\\ARM\\CMSDK_CM0\\Source\\system_CMSDK_CM0.c",
+              "RelativeDocumentMoniker": "software\\cmsis\\Device\\ARM\\CMSDK_CM0\\Source\\system_CMSDK_CM0.c",
+              "ToolTip": "D:\\Cortexm0ds\\software\\cmsis\\Device\\ARM\\CMSDK_CM0\\Source\\system_CMSDK_CM0.c",
+              "RelativeToolTip": "software\\cmsis\\Device\\ARM\\CMSDK_CM0\\Source\\system_CMSDK_CM0.c",
+              "ViewState": "AgIAACMAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000423|",
+              "WhenOpened": "2026-10-01T05:22:33.45Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

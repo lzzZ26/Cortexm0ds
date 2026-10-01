@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\mcu_system",
+    "\\software",
+    "\\software\\cmsis",
+    "\\software\\cmsis\\CMSIS",
+    "\\software\\cmsis\\Device",
+    "\\software\\cmsis\\Device\\ARM",
+    "\\software\\cmsis\\Device\\ARM\\CMSDK_CM0",
+    "\\software\\cmsis\\Device\\ARM\\CMSDK_CM0\\Source"
+  ],
+  "SelectedNode": "\\software\\cmsis\\Device\\ARM\\CMSDK_CM0\\Source\\system_CMSDK_CM0.c",
+  "PreviewInSolutionExplorer": false
+}
