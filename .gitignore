@@ -1,3 +1,10 @@
 # Temporary files
 *.out
 *.vcd
+# 编译/仿真产物（本项目维护）
+*.out
+*.vvp
+*.vcd
+*.fst
+.vs/
+sim_out/
