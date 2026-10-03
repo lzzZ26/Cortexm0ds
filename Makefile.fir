@@ -12,7 +12,7 @@ VVP    = vvp
 TB_DIR = tb
 OUT    = sim_out
 RTL    = rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/fir/fir_core.v \
-         rtl/fir/fir_top.v rtl/fir/fir_core_sym.v
+         rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/dma/dma_channel.v
 
 $(OUT):
 	mkdir -p $(OUT)
