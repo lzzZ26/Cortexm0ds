@@ -19,6 +19,7 @@ module dma_channel #(parameter DW = 32)(
     output reg         done_o,
     output reg         err_o,
     output reg         req_o,
+    output reg         irq_o,
     // AXI主口（由dma_top按req/grant多路选择后接共享总线）
     output reg         awvalid,  input  wire awready,
     output reg  [2:0]  awsize,   output reg  [1:0] awburst,
@@ -54,6 +55,7 @@ module dma_channel #(parameter DW = 32)(
   reg [2:0]  this_size;                // 本写拍AXI大小
   reg [31:0] shadow [0:4];
   reg        err;
+  reg        chain_cont;             // 链式续传标志：S_CH_D收齐描述符后置1，S_IDLE消费
   integer    i;
 
   wire [31:0] head = fifo[fifo_rp];
@@ -65,13 +67,13 @@ module dma_channel #(parameter DW = 32)(
 
   always @(posedge clk) begin
     if (!rstn) begin
-      st <= S_IDLE; busy_o <= 0; done_o <= 0; err_o <= 0; req_o <= 0;
+      st <= S_IDLE; busy_o <= 0; done_o <= 0; err_o <= 0; req_o <= 0; irq_o <= 0;
       awvalid <= 0; wvalid <= 0; arvalid <= 0; bready <= 0; rready <= 0;
       awsize <= 0; awburst <= 0; awlen <= 0; awaddr <= 0; wdata <= 0;
       arsize <= 0; arburst <= 0; arlen <= 0; araddr <= 0;
-      fifo_wp <= 0; fifo_rp <= 0; fifo_cnt <= 0; hpos <= 0; err <= 0;
+      fifo_wp <= 0; fifo_rp <= 0; fifo_cnt <= 0; hpos <= 0; err <= 0; chain_cont <= 0;
     end else begin
-      done_o <= 1'b0; err_o <= 1'b0;
+      done_o <= 1'b0; err_o <= 1'b0; irq_o <= 1'b0;
       case (st)
         S_IDLE: begin
           busy_o <= 1'b0;
@@ -87,12 +89,14 @@ module dma_channel #(parameter DW = 32)(
             fifo_wp <= 0; fifo_rp <= 0; fifo_cnt <= 0; err <= 0;
             busy_o <= 1'b1;
             st <= S_RD_AR;
-          end else if (cfg_load && cfg_ctrl[4] && !cfg_ctrl[0]) begin  // 链式续传（dma_top发load+CHAIN）
+          end else if (chain_cont) begin           // 链式续传：S_CH_D收齐后内部触发（cfg_load是
+                                                   // dma_top的一次性装载脉冲，不会二次出现）
+            chain_cont <= 1'b0;
             src_a <= shadow[0]; dst_a <= shadow[1];
             nxt_ptr <= shadow[4];
             burst_max <= shadow[3][7:5]; fsize <= shadow[3][10:8];
             fixed_src <= shadow[3][2]; fixed_dst <= shadow[3][3];
-            chain_en <= shadow[3][4]; irq_en <= shadow[3][1];
+            chain_en <= shadow[3][4]; irq_en <= shadow[3][1];  // 链下GO位忽略
             rem <= shadow[3][2] || shadow[3][3] ? (shadow[2] << shadow[3][10:8]) : shadow[2];
             units_rem <= shadow[2];
             hpos <= shadow[3][2] ? 4'd0 : shadow[0][1:0];
@@ -243,7 +247,7 @@ module dma_channel #(parameter DW = 32)(
             if (bcnt == 4) begin
               rready <= 1'b0; req_o <= 1'b0;
               if (rresp != 2'b00) begin err <= 1'b1; st <= S_DONE; end
-              else begin st <= S_IDLE; end            // 回IDLE走"链式续传"分支
+              else begin st <= S_IDLE; chain_cont <= 1'b1; end  // 回IDLE走链式续传分支
             end else bcnt <= bcnt + 8'd1;
           end
         end
@@ -253,7 +257,7 @@ module dma_channel #(parameter DW = 32)(
           req_o <= 1'b0;
           busy_o <= 1'b0;
           if (err) err_o <= 1'b1;
-          else     done_o <= 1'b1;
+          else begin done_o <= 1'b1; irq_o <= irq_en; end  // 中断=完成且本段IRQ_EN
           st <= S_IDLE;
         end
       endcase

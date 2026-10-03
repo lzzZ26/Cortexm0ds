@@ -43,7 +43,7 @@ module dma_top(
   reg  [31:0] ch_src [0:5], ch_dst [0:5], ch_len [0:5], ch_next [0:5];
   reg  [15:0] ch_ctrl [0:5];
   reg         ch_load [0:5];
-  wire        ch_busy [0:5], ch_done [0:5], ch_err [0:5], ch_req [0:5];
+  wire        ch_busy [0:5], ch_done [0:5], ch_err [0:5], ch_req [0:5], ch_irq [0:5];
   reg  [31:0] ch_done_q [0:5], ch_err_q [0:5];
   wire        ch_awvalid [0:5], ch_wvalid [0:5], ch_wlast [0:5], ch_arvalid [0:5];
   wire        ch_awready [0:5], ch_wready [0:5], ch_bvalid [0:5],
@@ -63,6 +63,7 @@ module dma_top(
         .cfg_src(ch_src[g]), .cfg_dst(ch_dst[g]), .cfg_len(ch_len[g]),
         .cfg_next(ch_next[g]), .cfg_ctrl(ch_ctrl[g]), .cfg_load(ch_load[g]),
         .busy_o(ch_busy[g]), .done_o(ch_done[g]), .err_o(ch_err[g]), .req_o(ch_req[g]),
+        .irq_o(ch_irq[g]),
         .awvalid(ch_awvalid[g]), .awready(ch_awready[g]), .awsize(ch_awsize[g]),
         .awburst(ch_awburst[g]), .awlen(ch_awlen[g]), .awaddr(ch_awaddr[g]),
         .wvalid(ch_wvalid[g]), .wready(ch_wready[g]), .wdata(ch_wdata[g]), .wlast(ch_wlast[g]),
@@ -193,7 +194,9 @@ module dma_top(
       end
     end else begin
       for (i = 0; i < 6; i = i + 1) begin
-        if (ch_done[i] && ch_ctrl[i][1]) int_status[i] <= 1'b1;
+        // 中断=通道完成脉冲且本段IRQ_EN（链式末段由描述符IRQ_EN驱动，
+        // 非链式由寄存器IRQ_EN驱动——通道内irq_o=done&&irq_en统一覆盖）
+        if (ch_irq[i]) int_status[i] <= 1'b1;
         if (ch_done[i]) ch_done_q[i] <= 1'b1;
         if (ch_err[i])  ch_err_q[i]  <= 1'b1;
         if (int_clr[i]) int_status[i] <= 1'b0;
