@@ -11,7 +11,8 @@ IV     = iverilog
 VVP    = vvp
 TB_DIR = tb
 OUT    = sim_out
-RTL    = rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/fir/fir_core.v
+RTL    = rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/fir/fir_core.v \
+         rtl/fir/fir_top.v
 
 $(OUT):
 	mkdir -p $(OUT)

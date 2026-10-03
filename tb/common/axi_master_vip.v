@@ -82,14 +82,17 @@ module axi_master_vip(
   end
 
   // 写：AW握手 -> 队列装载+W突发 -> B
+  // 注意：AW/AR的VALID/SEL用非阻塞赋值（沿上稳定）——从机恒READY时握手沿
+  //       与VALID置位沿重合，采样always块必须与从机看到同一个稳定值，
+  //       否则握手沿被采样器错过而死等（iverilog调度顺序逐沿不定）。
   task axi_wr(input [31:0] addr, input [7:0] len, input [1:0] burst, input [2:0] size);
     integer i;
     begin
       @(posedge ACLK);
-      aw_hs = 1'b0; AW_SEL = 1'b1; AW_VALID = 1'b1;
+      aw_hs = 1'b0; AW_SEL <= 1'b1; AW_VALID <= 1'b1;
       AW_ADDR = addr; AW_LEN = len; AW_BURST = burst; AW_SIZE = size;
       while (!aw_hs) @(posedge ACLK);
-      AW_VALID = 1'b0; AW_SEL = 1'b0;
+      AW_VALID <= 1'b0; AW_SEL <= 1'b0;
       for (i = 0; i <= len; i = i + 1) w_q[i] = vip_wdata[i];
       w_total = len;
       @(posedge ACLK);
@@ -104,10 +107,10 @@ module axi_master_vip(
     integer beat;
     begin
       @(posedge ACLK);
-      ar_hs = 1'b0; AR_SEL = 1'b1; AR_VALID = 1'b1;
+      ar_hs = 1'b0; AR_SEL <= 1'b1; AR_VALID <= 1'b1;
       AR_ADDR = addr; AR_LEN = len; AR_BURST = burst; AR_SIZE = size;
       while (!ar_hs) @(posedge ACLK);
-      AR_VALID = 1'b0; AR_SEL = 1'b0;
+      AR_VALID <= 1'b0; AR_SEL <= 1'b0;
       for (beat = 0; beat <= len; beat = beat + 1) begin
         r_hs = 1'b0;
         while (!r_hs) @(posedge ACLK);
