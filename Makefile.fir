@@ -1,11 +1,31 @@
 # Makefile.fir —— 本项目仿真入口（官方makefile保持不动，故用独立文件名）
-# 用法：mingw32-make -f Makefile.fir <目标>
+# 用法：make -f Makefile.fir <目标>
+#   默认目标 all = 系统级软硬协同仿真（FIR滤波完整演示）
 MAKE ?= mingw32-make
 
 # 官方基线（跑官方makefile的compile+run）
 baseline:
 	$(MAKE) compile
 	vvp -n run.out | tail -5
+
+# 默认：系统级仿真（UART回显+DMA自检+FIR滤波黄金比对+指标输出）
+all: sim_tb_soc
+
+# 全量回归（13个TB）
+regression:
+	$(MAKE) -f Makefile.fir sim_tb_vip_smoke
+	$(MAKE) -f Makefile.fir sim_tb_arb
+	$(MAKE) -f Makefile.fir sim_tb_decode
+	$(MAKE) -f Makefile.fir sim_tb_fir_core
+	$(MAKE) -f Makefile.fir sim_tb_fir_top
+	$(MAKE) -f Makefile.fir sim_tb_fir_core_sym
+	$(MAKE) -f Makefile.fir sim_tb_dma_channel
+	$(MAKE) -f Makefile.fir sim_tb_dma_top
+	$(MAKE) -f Makefile.fir sim_tb_dma_chain
+	$(MAKE) -f Makefile.fir sim_tb_soc_smoke
+	$(MAKE) -f Makefile.fir sim_tb_soc
+	$(MAKE) -f Makefile.fir sim_tb_axi_rom
+	$(MAKE) -f Makefile.fir sim_tb_soc_smoke_rom
 
 IV     = iverilog
 VVP    = vvp
