@@ -11,7 +11,7 @@ baseline:
 # 默认：系统级仿真（UART回显+DMA自检+FIR滤波黄金比对+指标输出）
 all: sim_tb_soc
 
-# 全量回归（13个TB）
+# 全量回归（14个TB）
 regression:
 	$(MAKE) -f Makefile.fir sim_tb_vip_smoke
 	$(MAKE) -f Makefile.fir sim_tb_arb
@@ -26,6 +26,7 @@ regression:
 	$(MAKE) -f Makefile.fir sim_tb_soc
 	$(MAKE) -f Makefile.fir sim_tb_axi_rom
 	$(MAKE) -f Makefile.fir sim_tb_soc_smoke_rom
+	$(MAKE) -f Makefile.fir sim_tb_integ
 
 IV     = iverilog
 VVP    = vvp
