@@ -13,8 +13,9 @@ mkdir -p "$STAGE"
 
 # 本项目文件（不含官方core/ mcu_system/ software/ doc/）
 cp -r rtl tb sw/firmware tools fpga docs Makefile.fir .gitignore "$STAGE/"
-# 剔除冗余
-rm -rf "$STAGE/docs/superpowers" "$STAGE/docs/report" "$STAGE/docs/ppt"
+# 剔除冗余：superpowers为团队过程文档（含内部台账），不入交付包；
+# docs/report+ppt为交付物（与zip并列于deliverables/），不重复打包
+rm -rf "$STAGE/docs/superpowers"
 find "$STAGE" -name "*.o" -o -name "*.bin" -o -name "*.lst" -o -name "*.hex" -o -name "*.vvp" -o -name "*.vcd" | xargs rm -f
 rm -rf "$STAGE/sim_out" "$STAGE/.vs"
 # 官方文件引用说明（不随包分发，见README）

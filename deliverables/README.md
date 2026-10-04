@@ -16,7 +16,8 @@ tb/            本项目12个自检TB + common基础设施（VIP/检查器/存�
 sw/firmware/fir_demo/  演示固件（C源码+makefile，复用官方CMSIS编译）
 tools/         黄金模型生成器 + 打包脚本
 fpga/          PDS板级顶层/约束/README
-docs/          Spec/计划/走读笔记/指标记录/PPT与视频素材
+docs/          Spec/计划/走读笔记/指标记录/技术报告底稿/PPT与视频素材
+               （团队过程文档superpowers/不打包）
 Makefile.fir   仿真入口（13个make目标）
 官方工程获取.txt  官方DesignStart工程下载指引（不随包分发，按许可）
 ```
