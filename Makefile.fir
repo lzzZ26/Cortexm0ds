@@ -11,15 +11,18 @@ IV     = iverilog
 VVP    = vvp
 TB_DIR = tb
 OUT    = sim_out
-RTL    = rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/fir/fir_core.v \
+RTL    = rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v \
          rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/dma/dma_channel.v \
          rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v
 
 # 官方模块（只读复用，不改动）——官方makefile MODULES清单去掉本项目未实例化的
 # 系统级模块（cmsdk_mcu_system/cmsdk_mcu/clkctrl/pin_mux/clock_gate/
 # sysctrl/sysrom_table/官方addr_decode，后者由ic_axi_addr_decode取代；
-# cmsdk_axi_sram/cmsdk_axi_ram_beh由本项目axi_sram_sim取代——官方ram_beh
-# 写锁存带读写互斥，读在途时写AW被静默丢弃（B仍OKAY），详见axi_sram_sim.v）
+# cmsdk_axi_sram由本项目axi_sram_sim取代——官方ram_beh写锁存带读写互斥，
+# 读在途时写AW被静默丢弃（B仍OKAY），详见axi_sram_sim.v；
+# cmsdk_axi_slave_mux由本项目ic_axi_slave_mux取代——官方mux的B/R路由
+# 选择寄存器按VALID电平锁存（非握手），多主并发下路由被其它主机的请求
+# 刷新，DMA收到错误从机的R/R_LAST，详见ic_axi_slave_mux.v）
 REF_RTL = ./core/cortexm0_dap/cortexm0dap.v \
           ./core/cortexm0_integration/cortexm0_wic.v \
           ./core/cortexm0_integration/cortexm0_systick.v \
@@ -37,7 +40,6 @@ REF_RTL = ./core/cortexm0_dap/cortexm0dap.v \
           ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v \
           ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v \
           ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v \
-          ./mcu_system/cmsdk_axi_slave_mux/cmsdk_axi_slave_mux.v \
           ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v \
           ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v \
           ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v \

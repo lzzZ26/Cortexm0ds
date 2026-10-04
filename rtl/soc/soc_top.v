@@ -42,6 +42,7 @@ module soc_top #(
   wire [31:0] cm0_RDATA;   wire [1:0] cm0_RRESP;
   wire [31:0] intisr;
   wire        LOCKUP, SYSRESETREQ;
+  wire        cpu_halted, cpu_sleeping;      // 调试观测（TB层次引用）
 
   // ================= 共享总线（仲裁器输出→slave mux主侧） =================
   wire        sys_AWVALID, sys_AWREADY;
@@ -120,13 +121,13 @@ module soc_top #(
     .CODENSEQ(), .CODEHINTDE(), .SPECHTRANS(),
     // DEBUG
     .SWDITMS(1'b0), .TDI(1'b0), .SWDO(), .SWDOEN(), .TDO(), .nTDOEN(),
-    .DBGRESTART(1'b0), .DBGRESTARTED(), .EDBGRQ(1'b0), .HALTED(),
+    .DBGRESTART(1'b0), .DBGRESTARTED(), .EDBGRQ(1'b0), .HALTED(cpu_halted),
     // MISC
     .NMI(1'b0), .IRQ(intisr), .TXEV(), .RXEV(1'b0),
     .LOCKUP(LOCKUP), .SYSRESETREQ(SYSRESETREQ),
     .IRQLATENCY(8'h00), .ECOREVNUM(28'h0),
     // POWER MANAGEMENT
-    .GATEHCLK(), .SLEEPING(), .SLEEPDEEP(), .WAKEUP(), .WICSENSE(),
+    .GATEHCLK(), .SLEEPING(cpu_sleeping), .SLEEPDEEP(), .WAKEUP(), .WICSENSE(),
     .SLEEPHOLDREQn(1'b1), .SLEEPHOLDACKn(), .WICENREQ(1'b0), .WICENACK(),
     .CDBGPWRUPREQ(), .CDBGPWRUPACK(1'b0),
     // SCAN IO
@@ -173,10 +174,13 @@ module soc_top #(
     .dma_awsel(dma_awsel), .dma_arsel(dma_arsel),
     .defslv_awsel(defslv_awsel), .defslv_arsel(defslv_arsel));
 
-  // ================= 官方从机mux =================
+  // ================= 从机mux（本项目ic_axi_slave_mux） =================
   // port0=flash(只读) port1=sram port2=apbsys port3=gpio0
   // port4=fir port5=dma_cfg port6=defslv port7=gpio1 port8-9禁用
-  cmsdk_axi_slave_mux #(
+  // 不用官方cmsdk_axi_slave_mux：其B/R路由选择寄存器按VALID电平锁存（非握手），
+  // 多主并发下CPU取指ARVALID会在DMA读的R响应期间刷新路由，DMA收到错误从机的
+  // R/R_LAST→err→传输夭折（详见ic_axi_slave_mux.v头注释）。
+  ic_axi_slave_mux #(
     .PORT0_ENABLE(1), .PORT1_ENABLE(1), .PORT2_ENABLE(1), .PORT3_ENABLE(1),
     .PORT4_ENABLE(1), .PORT5_ENABLE(1), .PORT6_ENABLE(1), .PORT7_ENABLE(1),
     .PORT8_ENABLE(0), .PORT9_ENABLE(0), .DW(32))
@@ -232,9 +236,10 @@ module soc_top #(
     // 共享主侧
     .AW_VALID(sys_AWVALID), .AW_READY(sys_AWREADY),
     .W_READY(sys_WREADY),
-    .B_VALID(sys_BVALID), .B_RESP(sys_BRESP),
+    .B_VALID(sys_BVALID), .B_READY(sys_BREADY), .B_RESP(sys_BRESP),
     .AR_VALID(sys_ARVALID), .AR_READY(sys_ARREADY),
-    .R_VALID(sys_RVALID), .R_LAST(sys_RLAST), .R_DATA(sys_RDATA), .R_RESP(sys_RRESP));
+    .R_VALID(sys_RVALID), .R_LAST(sys_RLAST), .R_DATA(sys_RDATA), .R_RESP(sys_RRESP),
+    .R_READY(sys_RREADY));
 
   // ================= 存储 =================
   cmsdk_axi_flash #(.filename(FILENAME), .AW(16),
@@ -327,7 +332,7 @@ module soc_top #(
     .GPIOINT(gpio1_intr), .COMBINT(gpio1_combintr));
 
   // ================= FIR / DMA =================
-  fir_top #(.CORE_TYPE(0)) u_fir (
+  fir_top #(.CORE_TYPE(1)) u_fir (
     .ACLK(ACLK), .ARESETn(ARESETn),
     .AW_SEL(fir_awsel), .AW_VALID(sys_AWVALID), .AW_READY(fir_AWREADY),
     .AW_SIZE(sys_AWSIZE), .AW_BURST(sys_AWBURST), .AW_LEN(sys_AWLEN),

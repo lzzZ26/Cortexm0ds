@@ -65,6 +65,12 @@ module fir_top #(
   wire [31:0] core_dout;
   wire [31:0] ctrl_reg;                // bit0=CLR（写1清空）
   reg         clr_pulse;
+  // 组合弹/压信号：FIFO指针与计数统一在本块更新——若读块单独更新dot_cnt，
+  // 同拍"核输出入队+DOUT弹出"会竞争（读块在后，弹的-1覆盖推的+1），计数
+  // 漂移变低，写指针越过未读样本覆盖输出（实测输出流跳拍）；din侧同理
+  // （推写在后覆盖弹的-1，计数虚高，核消费陈旧样本）。
+  wire dout_pop = (rs == RS_DATA) && R_VALID && R_READY && r_sel && (r_a[11:0] == 12'h00C);
+  wire din_push = (ws == WS_DATA) && W_VALID && W_READY && w_sel && (w_a[11:0] == 12'h008);
 
   generate
     if (CORE_TYPE == 0) begin : core
@@ -93,20 +99,27 @@ module fir_top #(
       for (i = 0; i < 82; i = i + 1) coef_reg[i] <= 16'h0;
     end else begin
       clr_pulse <= 1'b0; cfg_we <= 1'b0;
-      // 核输出入FIFO
+      // 核输出入FIFO（与读侧弹出同拍时计数不变——互斥见dout_pop声明注释）
       if (core_dout_valid && (dot_cnt != DOUT_DEPTH)) begin
         dout_fifo[dot_wp] <= core_dout;
         dot_wp <= dot_wp + 1'b1;
-        dot_cnt <= dot_cnt + 1'b1;
+        if (!dout_pop) dot_cnt <= dot_cnt + 1'b1;
       end
-      // 核取输入
+      if (dout_pop) begin
+        dot_rp <= dot_rp + 1'b1;
+        if (!(core_dout_valid && (dot_cnt != DOUT_DEPTH))) dot_cnt <= dot_cnt - 1'b1;
+      end
+      // 核取输入（与W侧压样本同拍时计数不变——互斥见din_push声明注释）
       if (core_din_valid && core_din_ready) begin
         din_rp <= din_rp + 1'b1;
-        din_cnt <= din_cnt - 1'b1;
+        if (!din_push) din_cnt <= din_cnt - 1'b1;
       end
       case (ws)
         WS_IDLE: begin
-          AW_READY <= 1'b1;
+          // 仅接受选中事务：AW_READY按AW_SEL门控（总线AW对全部从机广播，
+          // 不门控会偷走其它从机的写事务——与AR侧同理，实测幻影事务会让
+          // 读状态机抓走CPU的SRAM读，DOUT读被夹带延迟）
+          AW_READY <= AW_SEL;
           if (AW_VALID && AW_READY) begin
             w_sel <= AW_SEL; w_a <= AW_ADDR; w_cnt <= AW_LEN; w_burst <= AW_BURST;
             w_size <= AW_SIZE;
@@ -115,17 +128,19 @@ module fir_top #(
           end
         end
         WS_DATA: begin
+          // DIN满反压：din_fifo满时W_READY拉低停等（否则写会被丢弃——
+          // 核输出侧反压冻结期间DIN不再消费，满即丢样本，实测冻结窗口丢输入）
+          if ((w_a[11:0] == 12'h008) && (din_cnt == DIN_DEPTH)) W_READY <= 1'b0;
+          else W_READY <= 1'b1;
           if (W_VALID && W_READY) begin
             if (w_sel) begin
               // 地址在0x4002_0000区域的寄存器写
               casez (w_a[11:0])
-                12'h008: begin                          // DIN：压样本
-                  if (din_cnt != DIN_DEPTH) begin
-                    din_fifo[din_wp] <= (w_size[0]) ?
-                        (w_a[1] ? W_DATA[31:16] : W_DATA[15:0]) : W_DATA[15:0];
-                    din_wp <= din_wp + 1'b1;
-                    din_cnt <= din_cnt + 1'b1;
-                  end
+                12'h008: begin                          // DIN：压样本（满时W_READY已停等）
+                  din_fifo[din_wp] <= (w_size[0]) ?
+                      (w_a[1] ? W_DATA[31:16] : W_DATA[15:0]) : W_DATA[15:0];
+                  din_wp <= din_wp + 1'b1;
+                  if (!(core_din_valid && core_din_ready)) din_cnt <= din_cnt + 1'b1;
                 end
                 12'h000: if (W_DATA[0]) clr_pulse <= 1'b1;   // CTRL CLR
                 12'h004, 12'h00C: ;                          // STATUS/DOUT：忽略写
@@ -148,6 +163,7 @@ module fir_top #(
         WS_RESP: begin
           if (B_VALID && B_READY) begin
             B_VALID <= 1'b0; ws <= WS_IDLE;
+            AW_READY <= 1'b0;        // 返回IDLE首拍不留敞口（WS_IDLE按AW_SEL重开）
           end
         end
       endcase
@@ -168,7 +184,9 @@ module fir_top #(
     end else begin
       case (rs)
         RS_IDLE: begin
-          AR_READY <= 1'b1;
+          // 仅接受选中事务（同WS_IDLE的AW_SEL门控；实测无门控时读状态机
+          // 抓走CPU对SRAM的轮询读，rs被幻影事务占用）
+          AR_READY <= AR_SEL;
           if (AR_VALID && AR_READY) begin
             r_sel <= AR_SEL; r_a <= AR_ADDR; r_cnt <= AR_LEN; r_burst <= AR_BURST;
             AR_READY <= 1'b0;
@@ -176,16 +194,17 @@ module fir_top #(
           end
         end
         RS_DATA: begin
-          R_VALID <= 1'b1;
+          // DOUT读在FIFO空时保持R_VALID=0等待数据：空读返回dout_fifo[dot_rp]
+          // 旧值（不弹指针），DMA会采到X/重复样本（实测ch1首8读命中空FIFO，
+          // out_buf[0..7]全X、偶发重拍，输出流整体错位）
+          if (!r_sel || (r_a[11:0] != 12'h00C) || (dot_cnt != 0)) R_VALID <= 1'b1;
           R_LAST  <= (r_cnt == 0);
           if (R_VALID && R_READY) begin
-            if (r_sel && (r_a[11:0] == 12'h00C) && (dot_cnt != 0)) begin
-              dot_rp <= dot_rp + 1'b1;             // DOUT弹样本（直接弹出）
-              dot_cnt <= dot_cnt - 1'b1;
-            end
+            // DOUT弹出在本块外的dout_pop完成（与入队统一更新，见声明注释）
             if (r_burst[0]) r_a <= r_a + 32'd4;
             if (r_cnt == 0) begin
-              rs <= RS_IDLE; R_VALID <= 1'b0; R_LAST <= 1'b0; AR_READY <= 1'b1;
+              rs <= RS_IDLE; R_VALID <= 1'b0; R_LAST <= 1'b0;
+              AR_READY <= 1'b0;      // 返回IDLE首拍不留敞口（RS_IDLE按AR_SEL重开）
             end else begin
               r_cnt <= r_cnt - 8'd1;
             end

@@ -8,3 +8,8 @@
 *.fst
 .vs/
 sim_out/
+# 固件编译产物（make 再生成）
+sw/firmware/fir_demo/*.o
+sw/firmware/fir_demo/*.lst
+sw/firmware/fir_demo/*.bin
+sw/firmware/fir_demo/*.hex
