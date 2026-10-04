@@ -111,6 +111,33 @@ module tb_soc;
     end
   endfunction
 
+  // ================= 指标监视（T14）：FIR从机侧握手统计 =================
+  // din_push/dout_pop为fir_top内部组合信号（含w_sel/r_sel门控，比裸W/R握手
+  // 更严——共享总线上其他从机的握手不会误计数）。DIN写=ch0输入搬运，
+  // DOUT读=ch1输出回收。系统延迟口径=首样本DIN→首样本DOUT（计划Step1代码
+  // 口径；计划总览"末DIN→首DOUT"对流水式FIR不适用，差值为负）。
+  reg [63:0] t_first_din, t_last_din, t_first_dout, t_last_dout;
+  reg [31:0] din_cnt, dout_cnt;
+  wire mon_din  = u_soc.u_fir.din_push;
+  wire mon_dout = u_soc.u_fir.dout_pop;
+  always @(posedge ACLK or negedge ARESETn) begin
+    if (!ARESETn) begin
+      t_first_din = 0; t_last_din = 0; t_first_dout = 0; t_last_dout = 0;
+      din_cnt = 0; dout_cnt = 0;
+    end else begin
+      if (mon_din) begin
+        if (din_cnt == 0) t_first_din = $time;
+        t_last_din = $time;
+        din_cnt = din_cnt + 1;
+      end
+      if (mon_dout) begin
+        if (dout_cnt == 0) t_first_dout = $time;
+        t_last_dout = $time;
+        dout_cnt = dout_cnt + 1;
+      end
+    end
+  end
+
   // ================= 最终判定 =================
   initial begin
     wait (done == 1'b1);
@@ -141,6 +168,24 @@ module tb_soc;
       if (bad_cnt != 0)
         $fatal(1, "FAIL: FIR误差超标样本数=%0d（阈值0.1%%）", bad_cnt);
       $display("FIR黄金比对：1024样本全部<0.1%%（严格阈值0.0977%%）");
+    end
+    // ================= 指标输出（T14）：监视计数器来自指标监视块 =================
+    begin : metrics
+      real thr, lat1, bw;
+      if (din_cnt != 32'd1024) $fatal(1, "FAIL: DIN监视计数=%0d（期望1024）", din_cnt);
+      if (dout_cnt != 32'd1024) $fatal(1, "FAIL: DOUT监视计数=%0d（期望1024）", dout_cnt);
+      thr  = $itor(dout_cnt) / (($itor(t_last_dout - t_first_dout) / 20.0) + 1.0);
+      lat1 = $itor(t_first_dout - t_first_din) / 1000.0;
+      bw   = 8192000.0 / $itor(t_last_dout - t_first_din);
+      if (thr <= 0.0 || thr > 1.25) $fatal(1, "FAIL: FIR吞吐量异常=%f samples/cycle", thr);
+      if (lat1 <= 0.0 || lat1 > 100.0) $fatal(1, "FAIL: 系统延迟异常=%f us", lat1);
+      if (bw <= 0.0 || bw > 2000.0) $fatal(1, "FAIL: DMA带宽异常=%f MB/s", bw);
+      $display("===== 指标（50MHz仿真）=====");
+      $display("DIN样本=%0d DOUT样本=%0d", din_cnt, dout_cnt);
+      $display("FIR吞吐量 = %.4f samples/cycle", thr);
+      $display("系统延迟(首DIN→首DOUT) = %.2f us", lat1);
+      $display("DMA带宽(FIR阶段4KB进+4KB出) = %.2f MB/s", bw);
+      $display("===== 指标结束 =====");
     end
     $display("PASS: 固件回显+DMA自检+FIR软硬协同全部通过");
     $finish;

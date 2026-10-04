@@ -1,6 +1,7 @@
 // fir_demo.c : 初赛/决赛演示固件
 // 流程：UART2横幅 → UART0回显64字符 → 6通道DMA自检（含中断） →
-//       FIR软硬协同（CPU配系数+DMA搬输入/收输出）→ 打印周期 → 结束
+//       FIR软硬协同（CPU配系数+DMA搬输入/收输出）→ 结束
+// 指标（吞吐/延迟/带宽）由TB侧监视FIR从机握手统计，固件不打印周期。
 //
 // 与计划原文的偏离（见SDD台账）：
 // 1. 不用fir_ref.h的double FIR重算——M0软浮点跑82x1024次乘加仿真不可接受。
@@ -97,7 +98,7 @@ int main(void)
     static unsigned int out_buf[FIR_N];      /* FIR Q1.31输出（DMA目的） */
     static unsigned int test_src[384];       /* 自检源：冻结图案6×256B */
     static volatile unsigned int *d;
-    unsigned int i, t0, t1;
+    unsigned int i;
     int ok, w;
 
     UartStdOutInit();
@@ -149,8 +150,8 @@ int main(void)
     for (i = 0; i < FIR_N; i++)
         in_buf[i] = (unsigned short)fir_input[i];    /* 低16位=样本 */
 
-    SysTick->CTRL = 0; SysTick->LOAD = 0xFFFFFF; SysTick->VAL = 0;
-    SysTick->CTRL = 1;                          /* 使能，无中断 */
+    /* 固件不用SysTick计时：官方加密核的VAL读回异常（24位计数器不可能
+       出现的差值，实测打印2^32-t1垃圾），指标由TB侧监视FIR从机握手统计 */
 
     g_dma_irqs = 0;      /* 配置GO前清零：仅累计本次传输的完成。若在dma_wait入口
                            清零，先GO的ch0可能已done、其irq被抹掉（bit0永不出现，
@@ -159,24 +160,23 @@ int main(void)
     DMA_CH(0, 0x00) = (unsigned int)&in_buf[0];     /* SRAM→FIR DIN */
     DMA_CH(0, 0x04) = FIR_BASE + 0x08;
     DMA_CH(0, 0x08) = FIR_N;                        /* FIXED_DST：拍数 */
-    DMA_CH(0, 0x0C) = 0x020Bu;                      /* GO|IRQ_EN|FIXED_DST|FSIZE=2(整字/拍) */
+    DMA_CH(0, 0x0C) = 0x020Bu;                      /* GO|IRQ_EN|FIXED_DST|BURST=0|FSIZE=2(整字/拍)
+                                                       BURST必须0：多拍FIXED写会填满DIN（核因DOUT满冻结）
+                                                       后W_READY停等且持有DMA授权→ch1饿死→死锁（T14实证
+                                                       8拍挂死；性能修复需DMA双主口，见指标记录备注） */
     /* 等ch0喂入第一拍再GO ch1：FIR的DOUT读在FIFO空时保持R_VALID=0等数据，
-       若ch1先读到空FIFO，其R挂起经仲裁器R通道串行化挡住ch0的写（死锁，实测）。
-       注意轮询变量不能用t0——t0是SysTick起点，被覆盖后cycles指标成垃圾 */
+       若ch1先读到空FIFO，其R挂起经仲裁器R通道串行化挡住ch0的写（死锁，实测） */
     for (i = 0; (FIR_STATUS & 1u) && (i < 1000000u); i++);
-    /* t0在此读：紧贴CTRL使能后读会抓到reload前的VAL=0（实测cycles打印成
-       2^32-t1的垃圾），轮询已隔开几十拍，reload稳定、计数已在走 */
-    t0 = SysTick->VAL;
     DMA_CH(1, 0x00) = FIR_BASE + 0x0C;              /* FIR DOUT→SRAM */
     DMA_CH(1, 0x04) = (unsigned int)&out_buf[0];
     DMA_CH(1, 0x08) = FIR_N;
-    DMA_CH(1, 0x0C) = 0x0207u;                      /* GO|IRQ_EN|FIXED_SRC|FSIZE=2(4字节/拍) */
+    DMA_CH(1, 0x0C) = 0x0207u;                      /* GO|IRQ_EN|FIXED_SRC|BURST=0|FSIZE=2(4字节/拍)
+                                                       BURST必须0：多拍FIXED读会追上核产出率（DOUT空）
+                                                       后R_VALID停等且持有DMA授权→ch0饿死→死锁（同上） */
     if (dma_wait(0x3u, 100000000u)) { uart_puts("** FIR DMA TIMEOUT **\n"); return 1; }
-    t1 = SysTick->VAL;
 
-    /* 误差校验在TB侧完成（TB读SRAM的out_buf与golden_q31.hex比对<0.1%），
-       固件只报告搬运完成与周期计数（见头注释1） */
-    uart_puts("cycles="); uart_put_dec((unsigned)(t0 - t1)); uart_puts("\n");
+    /* 误差校验与指标测量在TB侧完成（TB读SRAM的out_buf与golden_q31.hex
+       比对<0.1%；吞吐/延迟/带宽由TB监视FIR从机握手统计，见T14） */
     uart_puts("out="); uart_put_hex((unsigned int)&out_buf[0]); uart_puts("\n");
     uart_puts("** FIR DONE **\n");
 
