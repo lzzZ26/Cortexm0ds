@@ -97,6 +97,12 @@ Cortexm0ds/                        # = 官方工程 = 本项目仓库（github.c
 
 RTL任务的TDD循环约定（与软件TDD等价）：**Step 1 写自检TB（含断言与PASS/FAIL打印）→ Step 2 运行，预期编译错误"module not found"（红灯）→ Step 3 实现模块 → Step 4 运行，预期PASS退出0（绿灯）→ Step 5 git提交**。TB用`$fatal(1,"FAIL: ...")`失败、`$display("PASS: ..."); $finish;`通过。每任务一次提交（提交信息格式`feat: <模块> <说明>`，附计划要求的Co-Authored-By行）。
 
+### 执行状态回写（2026-10-04，T14-T16，详见SDD台账）
+
+- **T14 完成**（commit e967d7e）：tb_soc.v指标监视块（挂fir_top内部din_push/dout_pop——计划裸W_READY&&w_a条件缺SEL门控会误计数）+ docs/指标记录.md。实测@50MHz：FIR吞吐 核级1.0/系统级0.0363样本每拍、系统延迟3.04μs（首DIN→首DOUT；计划总览"末DIN→首DOUT"对流水式FIR不适用，差值为负）、DMA带宽14.44MB/s。**固件SysTick计时弃用**（官方加密核VAL读回异常，实测打印2^32-t1垃圾），指标全部TB侧测量。**重要发现**：把DMA BURST改7（8拍burst）提速会系统级死锁（ch1多拍FIXED读追平核产出率→DOUT空停等；ch0多拍FIXED写填满DIN→W_READY停等；停等期间持有dma_top授权+总线单事务在途→另一通道饿死→循环等待）——回退单拍（0x020B/0x0207）；性能修复需DMA双主口（ch0/ch1分占ic_axi_master_arb两主口），留作后续任务（分析见docs/指标记录.md）。
+- **T15 完成（文件部分，commit a263a21）**：axi_rom.v+自检TB（计划无TB、以板上验收为准，上板被裁定跳过故补仿真TB）+soc_top补MEM_IMPL=1 generate分支（计划称"已预留"实际T12未实现）+top_pgl.v/constraints.fdc/fpga/pango/README.md。ROM路径冒烟实测CPU启动输出Hello world。axi_rom对计划原文三处修正：①字节数组+字节流hex装载（objcopy格式是字节流，按字装载字节序全错）；②窄读按官方ram_beh语义摆通道；③AR_READY按AR_SEL门控。另R_LAST改组合（寄存版滞后一拍）。板上验收（Step5）与PDS GUI（Step4）留待板卡到位，步骤已写入README。
+- **T16 不执行**（用户裁定"不需要实际上板，只要仿真结果是正确的即可完成任务"）：上板演示/指标采集/频率优化整体跳过；决赛四项指标以T14仿真值记录。技术报告第5章口径相应改为"FPGA工程准备+ROM路径仿真验证"。
+
 ---
 
 ### 任务 0：工具链验证与官方基线跑通（单仓库模式）
