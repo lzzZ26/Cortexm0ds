@@ -10,8 +10,8 @@ module fir_core #(
     parameter CW   = 16,
     parameter DW   = 16
 )(
-    input  wire        clk,
-    input  wire        rstn,
+    input  wire        ACLK,
+    input  wire        ARESETn,
     // 系数配置（任意时刻可写）
     input  wire        cfg_we,
     input  wire [9:0]  cfg_addr,
@@ -43,15 +43,15 @@ module fir_core #(
   endfunction
 
   // 系数配置
-  always @(posedge clk) begin
-    if (!rstn) begin
+  always @(posedge ACLK) begin
+    if (!ARESETn) begin
       for (i = 0; i < TAPS; i = i + 1) c[i] <= {CW{1'b0}};
     end else if (cfg_we) c[cfg_addr] <= cfg_wdata;
   end
 
   // 数据通路
-  always @(posedge clk) begin
-    if (!rstn) begin
+  always @(posedge ACLK) begin
+    if (!ARESETn) begin
       busy <= 1'b0; ph <= 7'd0; acc <= 40'd0;
       dout_valid <= 1'b0; dout <= 32'd0;
       for (i = 0; i < TAPS; i = i + 1) x[i] <= {DW{1'b0}};

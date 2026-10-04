@@ -75,13 +75,13 @@ module fir_top #(
   generate
     if (CORE_TYPE == 0) begin : core
       fir_core #(.TAPS(82), .CW(16), .DW(16)) u_core (
-        .clk(ACLK), .rstn(ARESETn),
+        .ACLK(ACLK), .ARESETn(ARESETn),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_wdata(cfg_wdata),
         .din_valid(core_din_valid), .din_ready(core_din_ready), .din(core_din),
         .dout_valid(core_dout_valid), .dout_ready(dot_cnt != DOUT_DEPTH), .dout(core_dout));
     end else begin : core_sym
       fir_core_sym #(.TAPS(82), .CW(16), .DW(16)) u_core (
-        .clk(ACLK), .rstn(ARESETn),
+        .ACLK(ACLK), .ARESETn(ARESETn),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_wdata(cfg_wdata),
         .din_valid(core_din_valid), .din_ready(core_din_ready), .din(core_din),
         .dout_valid(core_dout_valid), .dout_ready(dot_cnt != DOUT_DEPTH), .dout(core_dout));

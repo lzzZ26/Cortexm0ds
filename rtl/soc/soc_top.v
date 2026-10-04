@@ -135,7 +135,7 @@ module soc_top #(
 
   // ================= 多主仲裁 =================
   ic_axi_master_arb u_arb (
-    .aclk(ACLK), .aresetn(ARESETn),
+    .ACLK(ACLK), .ARESETn(ARESETn),
     .m0_awvalid(cm0_AWVALID), .m0_awready(cm0_AWREADY), .m0_awsize(cm0_AWSIZE),
     .m0_awburst(cm0_AWBURST), .m0_awlen(cm0_AWLEN), .m0_awaddr(cm0_AWADDR),
     .m0_wvalid(cm0_WVALID), .m0_wready(cm0_WREADY), .m0_wlast(cm0_WLAST), .m0_wdata(cm0_WDATA),

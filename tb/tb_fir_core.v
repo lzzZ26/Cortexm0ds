@@ -27,7 +27,7 @@ module tb_fir_core;
     end
   endfunction
 
-  tb_clkreset #() u_ck (.clk(clk), .rstn(rstn));
+  tb_clkreset #() u_ck (.ACLK(clk), .ARESETn(rstn));
 
   // 随机反压：每拍3/4概率接受（核在最后一拍停等，反压必须逐拍变化才不饿死）；
   // force_accept=1时强制接受（排空阶段用）
@@ -37,7 +37,7 @@ module tb_fir_core;
   end
 
   fir_core #(.TAPS(82), .CW(16), .DW(16)) u_fir (
-    .clk(clk), .rstn(rstn),
+    .ACLK(clk), .ARESETn(rstn),
     .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_wdata(cfg_wdata),
     .din_valid(din_valid), .din_ready(din_ready), .din(din),
     .dout_valid(dout_valid), .dout_ready(dout_ready), .dout(dout));

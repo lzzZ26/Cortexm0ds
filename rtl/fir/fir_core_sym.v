@@ -11,8 +11,8 @@ module fir_core_sym #(
     parameter CW   = 16,
     parameter DW   = 16
 )(
-    input  wire        clk,
-    input  wire        rstn,
+    input  wire        ACLK,
+    input  wire        ARESETn,
     input  wire        cfg_we,
     input  wire [9:0]  cfg_addr,               // 0..40（上半系数；≥41忽略）
     input  wire [CW-1:0] cfg_wdata,
@@ -52,8 +52,8 @@ module fir_core_sym #(
   wire stall = dout_valid && !dout_ready;
   assign din_ready = !stall;
 
-  always @(posedge clk) begin
-    if (!rstn) begin
+  always @(posedge ACLK) begin
+    if (!ARESETn) begin
       for (i = 0; i < TAPS; i = i + 1) x[i] <= {DW{1'b0}};
       for (i = 0; i < H;    i = i + 1) c[i] <= {CW{1'b0}};
       for (i = 0; i < H;    i = i + 1) p1[i] <= 33'sd0;

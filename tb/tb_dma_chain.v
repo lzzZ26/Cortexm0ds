@@ -64,7 +64,7 @@ module tb_dma_chain;
     .irq_o(dma_irq));
 
   ic_axi_master_arb u_arb (
-    .aclk(ACLK), .aresetn(ARESETn),
+    .ACLK(ACLK), .ARESETn(ARESETn),
     .m0_awvalid(v_AW_VALID), .m0_awready(v_AW_READY), .m0_awsize(v_AW_SIZE),
     .m0_awburst(v_AW_BURST), .m0_awlen(v_AW_LEN), .m0_awaddr(v_AW_ADDR),
     .m0_wvalid(v_W_VALID), .m0_wready(v_W_READY), .m0_wlast(v_W_LAST), .m0_wdata(v_W_DATA),

@@ -59,7 +59,7 @@ module dma_top(
   generate
     for (g = 0; g < 6; g = g + 1) begin : ch
       dma_channel u_ch (
-        .clk(ACLK), .rstn(ARESETn),
+        .ACLK(ACLK), .ARESETn(ARESETn),
         .cfg_src(ch_src[g]), .cfg_dst(ch_dst[g]), .cfg_len(ch_len[g]),
         .cfg_next(ch_next[g]), .cfg_ctrl(ch_ctrl[g]), .cfg_load(ch_load[g]),
         .busy_o(ch_busy[g]), .done_o(ch_done[g]), .err_o(ch_err[g]), .req_o(ch_req[g]),

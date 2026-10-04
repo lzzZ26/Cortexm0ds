@@ -7,8 +7,8 @@
 // 链式：完成后从cfg_next读5字描述符{SRC,DST,LEN,CTRL,NEXT}自动续传（CHAIN位）。
 `timescale 1ns/1ps
 module dma_channel #(parameter DW = 32)(
-    input  wire        clk,
-    input  wire        rstn,
+    input  wire        ACLK,
+    input  wire        ARESETn,
     input  wire [31:0] cfg_src,
     input  wire [31:0] cfg_dst,
     input  wire [31:0] cfg_len,
@@ -65,8 +65,8 @@ module dma_channel #(parameter DW = 32)(
   // 末拍前一手握沿上bcnt尚未到blen，末拍周期wlast=0（协议检查器报W_LAST缺失）。
   assign wlast = (st == S_WR_D) && (bcnt == blen);
 
-  always @(posedge clk) begin
-    if (!rstn) begin
+  always @(posedge ACLK) begin
+    if (!ARESETn) begin
       st <= S_IDLE; busy_o <= 0; done_o <= 0; err_o <= 0; req_o <= 0; irq_o <= 0;
       awvalid <= 0; wvalid <= 0; arvalid <= 0; bready <= 0; rready <= 0;
       awsize <= 0; awburst <= 0; awlen <= 0; awaddr <= 0; wdata <= 0;

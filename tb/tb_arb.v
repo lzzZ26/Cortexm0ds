@@ -40,7 +40,7 @@ module tb_arb;
     .R_VALID(m1_R_VALID), .R_READY(m1_R_READY), .R_DATA(m1_R_DATA), .R_RESP(m1_R_RESP), .R_LAST(m1_R_LAST));
 
   ic_axi_master_arb u_arb (
-    .aclk(ACLK), .aresetn(ARESETn),
+    .ACLK(ACLK), .ARESETn(ARESETn),
     .m0_awvalid(m0_AW_VALID), .m0_awready(m0_AW_READY), .m0_awsize(m0_AW_SIZE),
     .m0_awburst(m0_AW_BURST), .m0_awlen(m0_AW_LEN), .m0_awaddr(m0_AW_ADDR),
     .m0_wvalid(m0_W_VALID), .m0_wready(m0_W_READY), .m0_wlast(m0_W_LAST), .m0_wdata(m0_W_DATA),

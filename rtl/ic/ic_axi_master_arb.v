@@ -4,8 +4,8 @@
 //             W数据仅在grant期间透传，未获授权主机的挂起WVALID不影响总线。
 `timescale 1ns/1ps
 module ic_axi_master_arb(
-    input  wire        aclk,
-    input  wire        aresetn,
+    input  wire        ACLK,
+    input  wire        ARESETn,
     // ---- 主0（CPU）----
     input  wire        m0_awvalid,  output wire m0_awready,
     input  wire [2:0]  m0_awsize,   input  wire [1:0] m0_awburst,
@@ -58,8 +58,8 @@ module ic_axi_master_arb(
   reg  wrr;                // 轮询指针
   wire w_done = w_active && bvalid && bready;
 
-  always @(posedge aclk or negedge aresetn) begin
-    if (!aresetn) begin w_grant <= 1'b0; w_active <= 1'b0; wrr <= 1'b0; end
+  always @(posedge ACLK or negedge ARESETn) begin
+    if (!ARESETn) begin w_grant <= 1'b0; w_active <= 1'b0; wrr <= 1'b0; end
     else begin
       if (!w_active) begin
         if (m0_awvalid || m1_awvalid) begin
@@ -100,8 +100,8 @@ module ic_axi_master_arb(
   reg  rrr;
   wire r_done = r_active && rvalid && rready && rlast;
 
-  always @(posedge aclk or negedge aresetn) begin
-    if (!aresetn) begin r_grant <= 1'b0; r_active <= 1'b0; rrr <= 1'b0; end
+  always @(posedge ACLK or negedge ARESETn) begin
+    if (!ARESETn) begin r_grant <= 1'b0; r_active <= 1'b0; rrr <= 1'b0; end
     else begin
       if (!r_active) begin
         if (m0_arvalid || m1_arvalid) begin
@@ -132,8 +132,8 @@ module ic_axi_master_arb(
   assign rready    = r_active ? (r_grant ? m1_rready : m0_rready) : 1'b1;
 
   // ============ 调试观测 ============
-  always @(posedge aclk or negedge aresetn) begin
-    if (!aresetn) begin
+  always @(posedge ACLK or negedge ARESETn) begin
+    if (!ARESETn) begin
       m0_done_cnt <= 0; m1_done_cnt <= 0; grant_imbalance <= 0;
     end else begin
       if (w_done) begin

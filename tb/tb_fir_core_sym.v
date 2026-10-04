@@ -26,7 +26,7 @@ module tb_fir_core_sym;
     end
   endfunction
 
-  tb_clkreset #() u_ck (.clk(clk), .rstn(rstn));
+  tb_clkreset #() u_ck (.ACLK(clk), .ARESETn(rstn));
 
   // 推送驱动器：din/din_valid由always块按索引逐沿推进（NBA，沿上稳定）。
   // 对称核无反压（din_ready恒1、每沿必装载），TB的阻塞赋值每沿改din会与
@@ -44,7 +44,7 @@ module tb_fir_core_sym;
   end
 
   fir_core_sym #(.TAPS(82), .CW(16), .DW(16)) u_fir (
-    .clk(clk), .rstn(rstn),
+    .ACLK(clk), .ARESETn(rstn),
     .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_wdata(cfg_wdata),
     .din_valid(din_valid), .din_ready(din_ready), .din(din),
     .dout_valid(dout_valid), .dout_ready(dout_ready), .dout(dout));
