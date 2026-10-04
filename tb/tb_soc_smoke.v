@@ -5,6 +5,7 @@
 //       不能按9600/3.125M波特采样（uart_bfm是波特采样，此TB不适用）。
 `timescale 1ns/1ps
 module tb_soc_smoke;
+  parameter MEM_IMPL = 0;   // 0=cmsdk_axi_flash(仿真) 1=axi_rom(FPGA路径，-P覆盖测试)
   wire ACLK, ARESETn;
   wire PCLK, PRESETn;
   wire uart0_rxd, uart0_txd, uart0_txen, uart2_txd, uart2_txen;
@@ -15,7 +16,7 @@ module tb_soc_smoke;
   assign PCLK = ACLK;                                  // PCLK=HCLK（官方clkctrl同）
   assign PRESETn = ARESETn;
 
-  soc_top #(.FILENAME("software/testcodes/hello/hello.hex"), .MEM_IMPL(0))
+  soc_top #(.FILENAME("software/testcodes/hello/hello.hex"), .MEM_IMPL(MEM_IMPL))
   u_soc (
     .ACLK(ACLK), .ARESETn(ARESETn), .PCLK(PCLK), .PRESETn(PRESETn),
     .uart0_rxd(uart0_rxd), .uart0_txd(uart0_txd), .uart0_txen(uart0_txen),

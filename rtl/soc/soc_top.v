@@ -242,15 +242,30 @@ module soc_top #(
     .R_READY(sys_RREADY));
 
   // ================= 存储 =================
-  cmsdk_axi_flash #(.filename(FILENAME), .AW(16),
-                    .WS_N(`ARM_CMSDK_ROM_MEM_WS_N), .WS_S(`ARM_CMSDK_ROM_MEM_WS_S))
-  u_flash (
-    .ACLK(ACLK), .ARESETn(ARESETn),
-    .AR_SEL(flash_arsel), .AR_VALID(sys_ARVALID), .AR_READY(flash_ARREADY),
-    .AR_SIZE(sys_ARSIZE), .AR_BURST(sys_ARBURST), .AR_LEN(sys_ARLEN),
-    .AR_ADDR(sys_ARADDR[15:0]),
-    .R_VALID(flash_RVALID), .R_READY(sys_RREADY), .R_LAST(flash_RLAST),
-    .R_DATA(flash_RDATA), .R_RESP(flash_RRESP));
+  // MEM_IMPL=0：官方cmsdk_axi_flash（仿真）；MEM_IMPL=1：本项目axi_rom
+  // （FPGA用，$readmemh→BRAM初值）。两实例端口接线一致（只读从机）。
+  generate
+    if (MEM_IMPL == 1) begin : rom_path
+      axi_rom #(.FILENAME(FILENAME), .AW(16))
+      u_flash (
+        .ACLK(ACLK), .ARESETn(ARESETn),
+        .AR_SEL(flash_arsel), .AR_VALID(sys_ARVALID), .AR_READY(flash_ARREADY),
+        .AR_SIZE(sys_ARSIZE), .AR_BURST(sys_ARBURST), .AR_LEN(sys_ARLEN),
+        .AR_ADDR(sys_ARADDR[15:0]),
+        .R_VALID(flash_RVALID), .R_READY(sys_RREADY), .R_LAST(flash_RLAST),
+        .R_DATA(flash_RDATA), .R_RESP(flash_RRESP));
+    end else begin : flash_path
+      cmsdk_axi_flash #(.filename(FILENAME), .AW(16),
+                        .WS_N(`ARM_CMSDK_ROM_MEM_WS_N), .WS_S(`ARM_CMSDK_ROM_MEM_WS_S))
+      u_flash (
+        .ACLK(ACLK), .ARESETn(ARESETn),
+        .AR_SEL(flash_arsel), .AR_VALID(sys_ARVALID), .AR_READY(flash_ARREADY),
+        .AR_SIZE(sys_ARSIZE), .AR_BURST(sys_ARBURST), .AR_LEN(sys_ARLEN),
+        .AR_ADDR(sys_ARADDR[15:0]),
+        .R_VALID(flash_RVALID), .R_READY(sys_RREADY), .R_LAST(flash_RLAST),
+        .R_DATA(flash_RDATA), .R_RESP(flash_RRESP));
+    end
+  endgenerate
 
   // SRAM：本项目axi_sram_sim（官方cmsdk_axi_ram_beh的写锁存带读写互斥，
   // 在"读在途+写AW重叠"时静默丢写且B仍回OKAY——本项目仲裁器1拍授权延迟

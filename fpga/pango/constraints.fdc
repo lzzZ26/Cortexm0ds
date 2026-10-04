@@ -1,0 +1,11 @@
+# constraints.fdc（示例，引脚号按开发板原理图修改——本模板未上板，引脚位置留占位）
+# 用法：PDS工程中添加本文件，替换<引脚号>为实物板卡约束
+create_clock -name clk_sys -period 20 [get_nets {clk_in}]     # 50MHz→先按20ns，PLL后10ns
+set_input_delay  -clock clk_sys -max 4 [get_ports {uart0_rxd_in rst_n_in}]
+set_output_delay -clock clk_sys -max 4 [get_ports {uart0_txd_out uart2_txd_out led_out[*]}]
+set_pin_loc uart0_txd_out  <引脚号>     # 按板卡原理图
+set_pin_loc uart0_rxd_in   <引脚号>
+set_pin_loc uart2_txd_out  <引脚号>
+set_pin_loc clk_in         <引脚号>
+set_pin_loc rst_n_in       <引脚号>
+set_pin_loc led_out[0]     <引脚号>

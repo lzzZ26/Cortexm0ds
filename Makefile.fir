@@ -13,7 +13,7 @@ TB_DIR = tb
 OUT    = sim_out
 RTL    = rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v \
          rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/dma/dma_channel.v \
-         rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v
+         rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v
 
 # 官方模块（只读复用，不改动）——官方makefile MODULES清单去掉本项目未实例化的
 # 系统级模块（cmsdk_mcu_system/cmsdk_mcu/clkctrl/pin_mux/clock_gate/
@@ -73,3 +73,12 @@ sim_%: $(OUT)
 	     $(TB_DIR)/common/axi_checker.v $(TB_DIR)/common/uart_bfm.v \
 	     $(TB_DIR)/common/tb_clkreset.v $(RTL) $(REF_RTL)
 	$(VVP) -n $(OUT)/$*.vvp
+
+# MEM_IMPL=1冒烟（axi_rom FPGA路径）：与sim_tb_soc_smoke同源，仅参数不同
+sim_tb_soc_smoke_rom: $(OUT)
+	$(IV) -g2001 -o $(OUT)/tb_soc_smoke_rom.vvp -s tb_soc_smoke \
+	     -Ptb_soc_smoke.MEM_IMPL=1 $(INCPATH) $(TB_DIR)/tb_soc_smoke.v \
+	     $(TB_DIR)/common/axi_master_vip.v $(TB_DIR)/common/axi_slave_mem.v \
+	     $(TB_DIR)/common/axi_checker.v $(TB_DIR)/common/uart_bfm.v \
+	     $(TB_DIR)/common/tb_clkreset.v $(RTL) $(REF_RTL)
+	$(VVP) -n $(OUT)/tb_soc_smoke_rom.vvp
