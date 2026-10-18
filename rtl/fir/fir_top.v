@@ -5,7 +5,7 @@
 // 注意：读通道每拍都置R_LAST（含单拍读，AXI要求末拍R_LAST=1）。
 `timescale 1ns/1ps
 module fir_top #(
-    parameter CORE_TYPE = 0      // 0=fir_core(串行) 1=fir_core_sym(对称并行)
+    parameter CORE_TYPE = 0      // 0=串行 1=对称并行 2=通用并行 3=双核(para+sym运行时可选)
 )(
     input  wire        ACLK,
     input  wire        ARESETn,
@@ -65,6 +65,12 @@ module fir_top #(
   wire [31:0] core_dout;
   wire [31:0] ctrl_reg;                // bit0=CLR（写1清空）
   reg         clr_pulse;
+  // 双核模式（CORE_TYPE=3）：CTRL bit1 在CLR写拍锁存（设计决策2——切换
+  // 必然伴随全清，杜绝脏历史样本）；0=para（默认，合规主路径）1=sym。
+  reg         mode_reg;
+  wire        para_din_ready, sym_din_ready;
+  wire        para_dout_valid, sym_dout_valid;
+  wire [31:0] para_dout, sym_dout;
   // 组合弹/压信号：FIFO指针与计数统一在本块更新——若读块单独更新dot_cnt，
   // 同拍"核输出入队+DOUT弹出"会竞争（读块在后，弹的-1覆盖推的+1），计数
   // 漂移变低，写指针越过未读样本覆盖输出（实测输出流跳拍）；din侧同理
@@ -75,16 +81,49 @@ module fir_top #(
   generate
     if (CORE_TYPE == 0) begin : core
       fir_core #(.TAPS(82), .CW(16), .DW(16)) u_core (
-        .ACLK(ACLK), .ARESETn(ARESETn),
+        .ACLK(ACLK), .ARESETn(ARESETn), .clr(clr_pulse),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_wdata(cfg_wdata),
         .din_valid(core_din_valid), .din_ready(core_din_ready), .din(core_din),
         .dout_valid(core_dout_valid), .dout_ready(dot_cnt != DOUT_DEPTH), .dout(core_dout));
-    end else begin : core_sym
+    end else if (CORE_TYPE == 1) begin : core_sym
       fir_core_sym #(.TAPS(82), .CW(16), .DW(16)) u_core (
-        .ACLK(ACLK), .ARESETn(ARESETn),
+        .ACLK(ACLK), .ARESETn(ARESETn), .clr(clr_pulse),
         .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_wdata(cfg_wdata),
         .din_valid(core_din_valid), .din_ready(core_din_ready), .din(core_din),
         .dout_valid(core_dout_valid), .dout_ready(dot_cnt != DOUT_DEPTH), .dout(core_dout));
+    end else if (CORE_TYPE == 2) begin : core_para
+      fir_core_para #(.TAPS(82), .CW(16), .DW(16)) u_core (
+        .ACLK(ACLK), .ARESETn(ARESETn), .clr(clr_pulse),
+        .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_wdata(cfg_wdata),
+        .din_valid(core_din_valid), .din_ready(core_din_ready), .din(core_din),
+        .dout_valid(core_dout_valid), .dout_ready(dot_cnt != DOUT_DEPTH), .dout(core_dout));
+    end else begin : core_dual
+      // 双核（设计决策2/3/5）：para=合规主核默认选中；sym=可选优化分支。
+      // din扇出到两核，但din_valid只给选中核（未选中核恒0，不空转）；
+      // cfg广播到两核系数副本（切换后系数一致）；dout按模式位mux；
+      // dout_ready只回给选中核（未选中核接0冻结，不产生伪输出）；
+      // clr同时打给两核+FIFO（切换必然全清）。
+      assign core_din_ready    = mode_reg ? sym_din_ready : para_din_ready;
+      assign core_dout_valid   = mode_reg ? sym_dout_valid : para_dout_valid;
+      assign core_dout         = mode_reg ? sym_dout : para_dout;
+
+      fir_core_para #(.TAPS(82), .CW(16), .DW(16)) u_para (
+        .ACLK(ACLK), .ARESETn(ARESETn), .clr(clr_pulse),
+        .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_wdata(cfg_wdata),
+        .din_valid(mode_reg ? 1'b0 : core_din_valid),
+        .din_ready(para_din_ready), .din(core_din),
+        .dout_valid(para_dout_valid),
+        .dout_ready(mode_reg ? 1'b0 : (dot_cnt != DOUT_DEPTH)),
+        .dout(para_dout));
+
+      fir_core_sym #(.TAPS(82), .CW(16), .DW(16)) u_sym (
+        .ACLK(ACLK), .ARESETn(ARESETn), .clr(clr_pulse),
+        .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_wdata(cfg_wdata),
+        .din_valid(mode_reg ? core_din_valid : 1'b0),
+        .din_ready(sym_din_ready), .din(core_din),
+        .dout_valid(sym_dout_valid),
+        .dout_ready(mode_reg ? (dot_cnt != DOUT_DEPTH) : 1'b0),
+        .dout(sym_dout));
     end
   endgenerate
 
@@ -96,6 +135,7 @@ module fir_top #(
       din_wp <= 0; din_rp <= 0; din_cnt <= 0;
       dot_wp <= 0; dot_rp <= 0; dot_cnt <= 0;
       cfg_we <= 0; cfg_addr <= 0; cfg_wdata <= 0; clr_pulse <= 0;
+      mode_reg <= 1'b0;                  // 双核默认para（合规主路径）
       for (i = 0; i < 82; i = i + 1) coef_reg[i] <= 16'h0;
     end else begin
       clr_pulse <= 1'b0; cfg_we <= 1'b0;
@@ -142,7 +182,10 @@ module fir_top #(
                   din_wp <= din_wp + 1'b1;
                   if (!(core_din_valid && core_din_ready)) din_cnt <= din_cnt + 1'b1;
                 end
-                12'h000: if (W_DATA[0]) clr_pulse <= 1'b1;   // CTRL CLR
+                12'h000: if (W_DATA[0]) begin         // CTRL：CLR=bit0，模式=bit1
+                  clr_pulse <= 1'b1;
+                  mode_reg  <= W_DATA[1];          // 模式在CLR拍锁存（设计决策2）
+                end
                 12'h004, 12'h00C: ;                          // STATUS/DOUT：忽略写
                 default: begin
                   if ((w_a[11:0] >= 12'h010) && (w_a[11:0] < 12'h158) && (w_size == 3'b010)) begin

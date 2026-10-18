@@ -37,7 +37,7 @@ module tb_fir_core;
   end
 
   fir_core #(.TAPS(82), .CW(16), .DW(16)) u_fir (
-    .ACLK(clk), .ARESETn(rstn),
+    .ACLK(clk), .ARESETn(rstn), .clr(1'b0),
     .cfg_we(cfg_we), .cfg_addr(cfg_addr), .cfg_wdata(cfg_wdata),
     .din_valid(din_valid), .din_ready(din_ready), .din(din),
     .dout_valid(dout_valid), .dout_ready(dout_ready), .dout(dout));

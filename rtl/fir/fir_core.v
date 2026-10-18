@@ -12,6 +12,7 @@ module fir_core #(
 )(
     input  wire        ACLK,
     input  wire        ARESETn,
+    input  wire        clr,        // 1拍脉冲：清移位寄存器/累加相位/输出（系数保持）
     // 系数配置（任意时刻可写）
     input  wire        cfg_we,
     input  wire [9:0]  cfg_addr,
@@ -56,6 +57,12 @@ module fir_core #(
       dout_valid <= 1'b0; dout <= 32'd0;
       for (i = 0; i < TAPS; i = i + 1) x[i] <= {DW{1'b0}};
     end else begin
+      if (clr) begin
+        // 设计决策1：清移位寄存器+相位/累加器+输出（系数保持）
+        busy <= 1'b0; ph <= 7'd0; acc <= 40'd0;
+        dout_valid <= 1'b0; dout <= 32'd0;
+        for (i = 0; i < TAPS; i = i + 1) x[i] <= {DW{1'b0}};
+      end else begin
       if (dout_valid && dout_ready) dout_valid <= 1'b0;
       if (busy) begin
         if (ph == TAPS-1) begin
@@ -75,6 +82,7 @@ module fir_core #(
         acc <= 40'd0;
         ph <= 7'd0;
         busy <= 1'b1;
+      end
       end
     end
   end

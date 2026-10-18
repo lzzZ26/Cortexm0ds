@@ -13,6 +13,7 @@ module fir_core_sym #(
 )(
     input  wire        ACLK,
     input  wire        ARESETn,
+    input  wire        clr,                    // 1拍脉冲：清移位寄存器+流水线（系数保持）
     input  wire        cfg_we,
     input  wire [9:0]  cfg_addr,               // 0..40（上半系数；≥41忽略）
     input  wire [CW-1:0] cfg_wdata,
@@ -26,7 +27,11 @@ module fir_core_sym #(
   localparam H = TAPS / 2;                     // 41
   reg [DW-1:0] x [0:TAPS-1];
   reg [CW-1:0] c [0:H-1];
-  reg signed [32:0] p1 [0:H-1];                // 预加×系数 → Q3.30
+  // PGL50H资源约束（设计决策3）：PGL50H仅84个APM乘法器，通用核独占82个，
+  // 对称核的41个乘法器必须走LUT实现（~6K LUT5）。PDS综合时用属性禁止
+  // 推断为DSP；若PDS不认可该属性（推断后爆仓）→备选手写参数化
+  // carry-save乘法器模块（接口不变，仅替换本核乘法表达式）。
+  (* use_dsp = "no" *) reg signed [32:0] p1 [0:H-1];   // 预加×系数 → Q3.30
   reg signed [39:0] p2 [0:20];                 // 41→21
   reg signed [39:0] p3 [0:10];                 // 21→11
   reg signed [39:0] p4 [0:5];                  // 11→6
@@ -64,9 +69,19 @@ module fir_core_sym #(
       for (i = 0; i < 2;    i = i + 1) p6[i] <= 40'sd0;
       p7 <= 40'sd0; vpipe <= 9'd0; dout_valid <= 1'b0; dout <= 32'd0;
     end else begin
-      // 系数（反压冻结不影响配置）
+      // 系数（反压冻结/clr不影响配置）
       if (cfg_we && (cfg_addr < H)) c[cfg_addr] <= cfg_wdata;
-      if (stall) begin
+      if (clr) begin
+        // 设计决策1：清移位寄存器+流水线（系数保持）
+        for (i = 0; i < TAPS; i = i + 1) x[i] <= {DW{1'b0}};
+        for (i = 0; i < H;    i = i + 1) p1[i] <= 33'sd0;
+        for (i = 0; i < 21;   i = i + 1) p2[i] <= 40'sd0;
+        for (i = 0; i < 11;   i = i + 1) p3[i] <= 40'sd0;
+        for (i = 0; i < 6;    i = i + 1) p4[i] <= 40'sd0;
+        for (i = 0; i < 3;    i = i + 1) p5[i] <= 40'sd0;
+        for (i = 0; i < 2;    i = i + 1) p6[i] <= 40'sd0;
+        p7 <= 40'sd0; vpipe <= 9'd0; dout_valid <= 1'b0; dout <= 32'd0;
+      end else if (stall) begin
         ; // 冻结：dout_valid=1保持、dout保持、整条流水保持（不消费din）
       end else begin
         // 数据移位

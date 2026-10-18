@@ -20,6 +20,7 @@ regression:
 	$(MAKE) -f Makefile.fir sim_tb_fir_top
 	$(MAKE) -f Makefile.fir sim_tb_fir_core_sym
 	$(MAKE) -f Makefile.fir sim_tb_fir_core_para
+	$(MAKE) -f Makefile.fir sim_tb_fir_top_dual
 	$(MAKE) -f Makefile.fir sim_tb_dma_channel
 	$(MAKE) -f Makefile.fir sim_tb_dma_top
 	$(MAKE) -f Makefile.fir sim_tb_dma_chain
@@ -95,6 +96,15 @@ sim_%: $(OUT)
 	     $(TB_DIR)/common/axi_checker.v $(TB_DIR)/common/uart_bfm.v \
 	     $(TB_DIR)/common/tb_clkreset.v $(RTL) $(REF_RTL)
 	$(VVP) -n $(OUT)/$*.vvp
+
+# 双核模式用例（CORE_TYPE=3）：与sim_tb_fir_top同源，仅参数不同
+sim_tb_fir_top_dual: $(OUT)
+	$(IV) -g2001 -o $(OUT)/tb_fir_top_dual.vvp -s tb_fir_top \
+	     -Ptb_fir_top.CORE_TYPE=3 $(INCPATH) $(TB_DIR)/tb_fir_top.v \
+	     $(TB_DIR)/common/axi_master_vip.v $(TB_DIR)/common/axi_slave_mem.v \
+	     $(TB_DIR)/common/axi_checker.v $(TB_DIR)/common/uart_bfm.v \
+	     $(TB_DIR)/common/tb_clkreset.v $(RTL) $(REF_RTL)
+	$(VVP) -n $(OUT)/tb_fir_top_dual.vvp
 
 # MEM_IMPL=1冒烟（axi_rom FPGA路径）：与sim_tb_soc_smoke同源，仅参数不同
 sim_tb_soc_smoke_rom: $(OUT)
