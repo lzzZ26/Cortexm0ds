@@ -28,10 +28,11 @@ module tb_fir_core_para;
   reg [31:0] golden_gain [0:1023];
   reg [31:0] golden      [0:1023];     // 当前相黄金（相开始时拷贝）
   reg [31:0] imp_exp     [0:9];        // 冲激索引期望（仅c[7]=0x4000）
-  integer n, out_cnt, err_cnt, gap_bad, sat_cnt, zero_err, imp_err;
+  integer n, out_cnt, err_cnt, gap_bad, sat_cnt, zero_err, imp_err, stall_cnt;
   reg [63:0] last_valid_cycle;
   reg [2:0] chk_mode;                   // 0=不比对 1=黄金 2=全零 3=冲激索引
   reg       sat_chk, gap_chk;
+  reg       rnd_ready;                  // 1=输出随机反压（T13 stall路径验证）
 
   real hw_r, ref_r, denom;
   function real rel_err; input [31:0] hw; input [31:0] ref;
@@ -47,6 +48,13 @@ module tb_fir_core_para;
   endfunction
 
   tb_clkreset #() u_ck (.clk(clk), .rstn(rstn));
+
+  // 输出反压：rnd_ready=1时每拍3/4概率接受（其余保持等待——AXI-Stream语义：
+  // 输出在!ready期间保持，消费者恰好接受一次；**无重放**，接受拍记分板即可）。
+  // rnd_ready=0时恒接受（黄金比对相位，计数确定）。
+  always @(posedge clk) begin
+    dout_ready <= rnd_ready ? (($random % 4) != 0) : 1'b1;
+  end
 
   // 推送驱动器：NBA逐沿推进（T8裁决——阻塞赋值每沿改din会丢首样本）；
   // AXI式握手：valid&&ready同沿完成才推下一拍；反压沿保持valid/din待重发
@@ -152,9 +160,9 @@ module tb_fir_core_para;
   initial begin
     clr = 0;
     cfg_we = 0; cfg_addr = 0; cfg_wdata = 0;
-    din_valid = 0; din = 0; dout_ready = 1;
-    chk_mode = 0; sat_chk = 0; gap_chk = 0;
-    out_cnt = 0; err_cnt = 0; gap_bad = 0; sat_cnt = 0;
+    din_valid = 0; din = 0;
+    chk_mode = 0; sat_chk = 0; gap_chk = 0; rnd_ready = 0;
+    out_cnt = 0; err_cnt = 0; gap_bad = 0; sat_cnt = 0; stall_cnt = 0;
     zero_err = 0; imp_err = 0;
     push_en = 0; push_len = 0; push_n = 0;
     last_valid_cycle = 0;
@@ -269,7 +277,24 @@ module tb_fir_core_para;
     $display("PASS F3: 覆盖写回归（干扰值→真值全部落位）");
     out_cnt = 0; err_cnt = 0;
 
-    $display("PASS: 通用并行FIR全用例（对称+非对称+大系数+吞吐+CLR+cfg）");
+    // ---- 用例G：随机输出反压（T13 stall路径——接受拍记分板，输出保持直到接受） ----
+    cfg_load(16'h0000, 1);
+    for (n = 0; n < 1024; n = n + 1) golden[n] = golden_asym[n];
+    chk_mode = 1;
+    do_clr;
+    rnd_ready = 1;
+    stall_cnt = 0;
+    run_stream(1024);
+    rnd_ready = 0;
+    repeat (20) @(posedge clk);
+    chk_mode = 0;
+    if (out_cnt != 1024) $fatal(1, "FAIL G: 输出数=%0d（应恰好1024）", out_cnt);
+    if (err_cnt != 0) $fatal(1, "FAIL G: 随机反压黄金比对误差超标 %0d处", err_cnt);
+    if (stall_cnt == 0) $fatal(1, "FAIL G: 反压未生效（stall_cnt=0，测试无效）");
+    $display("PASS G: 随机输出反压下降（stall %0d 拍，接受拍记分板全对）", stall_cnt);
+    out_cnt = 0; err_cnt = 0;
+
+    $display("PASS: 通用并行FIR全用例（对称+非对称+大系数+吞吐+CLR+cfg+反压）");
     $finish;
   end
 
@@ -304,6 +329,7 @@ module tb_fir_core_para;
       endcase
       out_cnt = out_cnt + 1;
     end
+    if (dout_valid && !dout_ready) stall_cnt = stall_cnt + 1;
   end
 
   // 超时兜底

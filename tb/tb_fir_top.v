@@ -145,13 +145,14 @@ module tb_fir_top #(
   // 写拍锁存；每相切换均伴随CLR（清FIFO+双核移位寄存器/流水线，无脏历史）。
   // 每相黄金均从零状态起算（n=0），与golden数据生成口径一致。
   task cfg_coeff;
-    input integer which;      // 0=sym 1=asym 2=gain
+    input integer which;      // 0=sym 1=asym 2=gain 3=全零
     integer k;
     begin
       for (k = 0; k < 82; k = k + 1)
         u_vip.vip_wdata[k] = (which == 0) ? {16'h0, coeff[k]} :
                              (which == 1) ? {16'h0, coeff_asym[k]} :
-                                            {16'h0, coeff_gain[k]};
+                             (which == 2) ? {16'h0, coeff_gain[k]} :
+                                            {16'h0, 16'h0000};
       u_vip.axi_wr(32'h4002_0010, 8'd81, 2'b01, 3'b010);
     end
   endtask
@@ -250,8 +251,32 @@ module tb_fir_top #(
     if (err_cnt != 0) $fatal(1, "FAIL ④: 大系数黄金比对失败 %0d处", err_cnt);
     if (sat_cnt == 0) $fatal(1, "FAIL ④: 饱和路径未被压到（sat_cnt=0）");
     $display("PASS ④: 大系数饱和回归（钳位 %0d 处）", sat_cnt);
+    err_cnt = 0;
 
-    $display("PASS: FIR从机双核模式（para默认+sym可选+CLR切换+非对称+饱和）");
+    // ---- ⑤ 模式判别（证明sym核确实被选中——Important评审项） ----
+    // 仅c[0]=0x4000，输入冲激x[0]=0x7FFF后接0：
+    //   para: y[n]=c[0]·x[n]          → y[81]=0
+    //   sym : y[n]=c[0]·(x[n]+x[n-81])→ y[81]=c[0]·x[0]=0x3FFF8000
+    u_vip.vip_wdata[0] = 32'h1;                       // para+CLR
+    u_vip.axi_wr(32'h4002_0000, 8'd0, 2'b00, 3'b000);
+    cfg_coeff(3);                                     // 全部清零
+    u_vip.vip_wdata[0] = 32'h4000;
+    u_vip.axi_wr(32'h4002_0010, 8'd0, 2'b00, 3'b010); // c[0]=0x4000
+    for (i = 0; i < 1024; i = i + 1) gold_sel[i] = 32'h0;
+    gold_sel[0] = 32'h3FFF8000;
+    push_drain(82);
+    if (err_cnt != 0) $fatal(1, "FAIL ⑤a: para模式c[0]冲激比对失败 %0d处", err_cnt);
+    $display("PASS ⑤a: para模式 y[81]=0（c[0]仅作用于x[n]）");
+    err_cnt = 0;
+
+    u_vip.vip_wdata[0] = 32'h3;                       // sym+CLR
+    u_vip.axi_wr(32'h4002_0000, 8'd0, 2'b00, 3'b000);
+    gold_sel[81] = 32'h3FFF8000;                      // sym: y[81]=c[0]·x[0]
+    push_drain(82);
+    if (err_cnt != 0) $fatal(1, "FAIL ⑤b: sym模式c[0]冲激比对失败 %0d处（模式未切换？）", err_cnt);
+    $display("PASS ⑤b: sym模式 y[81]=c[0]×x[0]（证明sym核被选中）");
+
+    $display("PASS: FIR从机双核模式（para默认+sym可选+CLR切换+非对称+饱和+模式判别）");
     $finish;
   end
   end
