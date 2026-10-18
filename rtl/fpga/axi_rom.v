@@ -1,6 +1,9 @@
 // axi_rom.v : FPGA用只读ROM（CMSDK从机风格，替代仿真flash模型用于板级）
-// $readmemh初始值在PDS综合时推断为BRAM/ROM初值（若工具不支持initial初始化，
-// 改为厂商IP生成.coe——以PDS文档为准，接口不变）。
+// $readmemh初始值在PDS综合时推断为BRAM/ROM初值。若工具不支持initial初始化，
+// 备选方案=**纯RTL case-ROM**（不引入厂商IP/原语，官方答疑#5）：
+//   python tools/gen_rom_rtl.py <固件hex> -o rtl/fpga/rom_case.v
+// 生成的 rom_case 模块为组合case语句（字地址→32位数据，小端口径与本文件一致），
+// 用它替换本文件的 $readmemh 初值读取即可，AXI接口不变。
 //
 // 与计划原文的两处修正（T15实证）：
 // 1. 窄读通道摆放：官方ram_beh语义=数据摆在地址对应字节通道、未选通道=0
