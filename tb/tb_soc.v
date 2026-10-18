@@ -5,7 +5,11 @@
 //       FIR输出黄金比对（TB读SRAM的out_buf与tb/data/golden_q31.hex逐样本比，
 //       相对误差<0.1%——out_buf字索引0x011A随固件链接地址，固件打印"out="行备查）。
 `timescale 1ns/1ps
-module tb_soc;
+module tb_soc #(
+  parameter FIRMWARE    = "sw/firmware/fir_demo/fir_demo.hex",
+  parameter GOLDEN_FILE = "tb/data/golden_q31.hex",
+  parameter OUT_IDX     = 16'h011A      // out_buf SRAM字索引（固件"out="行备查）
+);
   wire ACLK, ARESETn;
   wire PCLK, PRESETn;
   wire uart0_rxd, uart0_txd, uart0_txen, uart2_txd, uart2_txen;
@@ -16,7 +20,7 @@ module tb_soc;
   assign PCLK = ACLK;
   assign PRESETn = ARESETn;
 
-  soc_top #(.FILENAME("sw/firmware/fir_demo/fir_demo.hex"), .MEM_IMPL(0))
+  soc_top #(.FILENAME(FIRMWARE), .MEM_IMPL(0))
   u_soc (
     .ACLK(ACLK), .ARESETn(ARESETn), .PCLK(PCLK), .PRESETn(PRESETn),
     .uart0_rxd(uart0_rxd), .uart0_txd(uart0_txd), .uart0_txen(uart0_txen),
@@ -63,7 +67,7 @@ module tb_soc;
 
   // 黄金模型（任务5生成：双精度参考量化到Q1.31）
   reg [31:0] gmem [0:1023];
-  initial $readmemh("tb/data/golden_q31.hex", gmem);
+  initial $readmemh(GOLDEN_FILE, gmem);
 
   reg [8*63:0] cur_line;
   integer cli;
@@ -154,7 +158,7 @@ module tb_soc;
       for (gi = 0; gi < 1024; gi = gi + 1) begin
         // out_buf在SRAM的字索引：0x20000468>>2=0x011A（固件main里static数组
         // 链接地址，改固件须同步——固件打印"out="行备查）
-        hw_v = u_soc.u_sram.mem[16'h011A + gi[9:0]];
+        hw_v = u_soc.u_sram.mem[OUT_IDX + gi[9:0]];
         g_v  = gmem[gi];
         d_v  = hw_v - g_v;
         a_d = (d_v < 0) ? -d_v : d_v;      // 相对误差判定：|hw-ref| > |ref|/1024

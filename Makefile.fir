@@ -26,6 +26,7 @@ regression:
 	$(MAKE) -f Makefile.fir sim_tb_dma_chain
 	$(MAKE) -f Makefile.fir sim_tb_soc_smoke
 	$(MAKE) -f Makefile.fir sim_tb_soc
+	$(MAKE) -f Makefile.fir sim_tb_soc_asym
 	$(MAKE) -f Makefile.fir sim_tb_axi_rom
 	$(MAKE) -f Makefile.fir sim_tb_soc_smoke_rom
 	$(MAKE) -f Makefile.fir sim_tb_integ
@@ -105,6 +106,15 @@ sim_tb_fir_top_dual: $(OUT)
 	     $(TB_DIR)/common/axi_checker.v $(TB_DIR)/common/uart_bfm.v \
 	     $(TB_DIR)/common/tb_clkreset.v $(RTL) $(REF_RTL)
 	$(VVP) -n $(OUT)/tb_fir_top_dual.vvp
+
+# 非对称固件系统级验证（复用tb_soc，固化asym固件与asym黄金）
+sim_tb_soc_asym: $(OUT)
+	$(IV) -g2001 -o $(OUT)/tb_soc_asym.vvp -s tb_soc_asym $(INCPATH) \
+	     $(TB_DIR)/tb_soc_asym.v $(TB_DIR)/tb_soc.v \
+	     $(TB_DIR)/common/axi_master_vip.v $(TB_DIR)/common/axi_slave_mem.v \
+	     $(TB_DIR)/common/axi_checker.v $(TB_DIR)/common/uart_bfm.v \
+	     $(TB_DIR)/common/tb_clkreset.v $(RTL) $(REF_RTL)
+	$(VVP) -n $(OUT)/tb_soc_asym.vvp
 
 # MEM_IMPL=1冒烟（axi_rom FPGA路径）：与sim_tb_soc_smoke同源，仅参数不同
 sim_tb_soc_smoke_rom: $(OUT)

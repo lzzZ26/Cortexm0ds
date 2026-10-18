@@ -24,6 +24,14 @@
 #include "uart_stdout.h"
 #include "fir_golden.h"
 
+/* 非对称演示版：-DFIR_ASYM 选择非对称系数表（流程与对称版完全一致，
+   仅系数数组不同；黄金核对仍在TB/板级侧，固件不做长循环校验） */
+#ifdef FIR_ASYM
+#define FIR_COEFF_TABLE fir_coeff_asym
+#else
+#define FIR_COEFF_TABLE fir_coeff
+#endif
+
 #define FIR_BASE   0x40020000u
 #define FIR_CTRL   (*(volatile unsigned int *)(FIR_BASE + 0x00))
 #define FIR_STATUS (*(volatile unsigned int *)(FIR_BASE + 0x04))
@@ -144,9 +152,12 @@ int main(void)
     uart_puts("** DMA PASS **\n");
 
     /* ---- 3) FIR软硬协同：CPU配系数 → DMA搬输入/收输出 ---- */
+#ifdef FIR_ASYM
+    uart_puts("** FIR ASYM MODE **\n");         /* 现场区分固件版本 */
+#endif
     FIR_CTRL = 1;                               /* CLR */
     for (i = 0; i < FIR_TAPS; i++)
-        FIR_COEF(i) = (unsigned short)fir_coeff[i];
+        FIR_COEF(i) = (unsigned short)FIR_COEFF_TABLE[i];
     for (i = 0; i < FIR_N; i++)
         in_buf[i] = (unsigned short)fir_input[i];    /* 低16位=样本 */
 

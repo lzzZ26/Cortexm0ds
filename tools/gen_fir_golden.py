@@ -67,7 +67,19 @@ def main():
     # 4) 双精度FIR（用量化值）→ 量化到Q1.31
     yq = [q(v, 32) for v in fir_ref([v / 32768.0 for v in cq],
                                    [v / 32768.0 for v in xq])]
-    # 5) 落盘
+    # 5) 非对称黄金两套（设计决策4：同一四段输入分别生成）：
+    #    ①随机系数（固定seed均匀分布，任意非对称——通用核合规主路径）
+    random.seed(20261019)
+    c_asym = [random.uniform(-1.0, 1.0) for _ in range(TAPS)]
+    #    ②大系数集（直流增益>1，专压饱和路径：全正0.5..1.0，和≈61）
+    random.seed(20261020)
+    c_gain = [random.uniform(0.5, 1.0) for _ in range(TAPS)]
+    cq_asym = None
+    for tag, cset in (("asym", c_asym), ("gain", c_gain)):
+        cq_set, _ = gen_extra_set(tag, cset, xq)
+        if tag == "asym":
+            cq_asym = cq_set
+    # 6) 落盘
     os.makedirs("tb/data", exist_ok=True)
     os.makedirs("sw/firmware/fir_demo", exist_ok=True)
     with open("tb/data/coeff_q15.hex", "w") as f:
@@ -80,19 +92,11 @@ def main():
         f.write("// 由 tools/gen_fir_golden.py 生成，勿手改\n")
         f.write("#define FIR_TAPS %d\n#define FIR_N %d\n" % (TAPS, N))
         f.write("static const short fir_coeff[FIR_TAPS] = {%s};\n" % ",".join(map(str, cq)))
+        f.write("static const short fir_coeff_asym[FIR_TAPS] = {%s};\n" % ",".join(map(str, cq_asym)))
         f.write("static const short fir_input[FIR_N] = {%s};\n" % ",".join(map(str, xq)))
         f.write("static const int   fir_golden[FIR_N] = {%s};\n" % ",".join(map(str, yq)))
     print("生成完成: coeff_q15.hex / input_q15.hex / golden_q31.hex / fir_golden.h")
     print("系数示例(前4):", cq[:4], " 输入示例(前4):", xq[:4], " 期望输出示例(前4):", yq[:4])
-    # 6) 非对称黄金两套（设计决策4：同一四段输入分别生成）：
-    #    ①随机系数（固定seed均匀分布，任意非对称——通用核合规主路径）
-    random.seed(20261019)
-    c_asym = [random.uniform(-1.0, 1.0) for _ in range(TAPS)]
-    #    ②大系数集（直流增益>1，专压饱和路径：全正0.5..1.0，和≈61）
-    random.seed(20261020)
-    c_gain = [random.uniform(0.5, 1.0) for _ in range(TAPS)]
-    for tag, cset in (("asym", c_asym), ("gain", c_gain)):
-        gen_extra_set(tag, cset, xq)
     print("生成完成: coeff_asym_q15.hex / golden_asym_q31.hex / "
           "coeff_gain_q15.hex / golden_gain_q31.hex")
 

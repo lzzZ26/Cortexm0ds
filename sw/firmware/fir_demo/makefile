@@ -11,11 +11,19 @@ CC        = arm-none-eabi-gcc
 OBJDUMP   = arm-none-eabi-objdump
 OBJCOPY   = arm-none-eabi-objcopy
 TESTNAME  = fir_demo
+SRCNAME   = fir_demo
+EXTRA_CFLAGS =
 
-all:
-	$(CC) -g -O3 -mthumb -mcpu=cortex-m0 \
+all: build
+
+# 非对称演示固件：同一源码/流程，仅 -DFIR_ASYM 选择 fir_coeff_asym
+asym:
+	$(MAKE) build TESTNAME=fir_demo_asym EXTRA_CFLAGS=-DFIR_ASYM
+
+build:
+	$(CC) -g -O3 -mthumb -mcpu=cortex-m0 $(EXTRA_CFLAGS) \
 		$(STARTUP) \
-		$(TESTNAME).c \
+		$(SRCNAME).c \
 		$(SOFTWARE)/common/retarget/retarget.c \
 		$(SOFTWARE)/common/retarget/uart_stdout.c \
 		$(SYSTEM) \
