@@ -11,7 +11,7 @@ baseline:
 # 默认：系统级仿真（UART回显+DMA自检+FIR滤波黄金比对+指标输出）
 all: sim_tb_soc
 
-# 全量回归（14个TB）
+# 全量回归（15个TB）
 regression:
 	$(MAKE) -f Makefile.fir sim_tb_vip_smoke
 	$(MAKE) -f Makefile.fir sim_tb_arb
@@ -19,6 +19,7 @@ regression:
 	$(MAKE) -f Makefile.fir sim_tb_fir_core
 	$(MAKE) -f Makefile.fir sim_tb_fir_top
 	$(MAKE) -f Makefile.fir sim_tb_fir_core_sym
+	$(MAKE) -f Makefile.fir sim_tb_fir_core_para
 	$(MAKE) -f Makefile.fir sim_tb_dma_channel
 	$(MAKE) -f Makefile.fir sim_tb_dma_top
 	$(MAKE) -f Makefile.fir sim_tb_dma_chain
@@ -33,7 +34,7 @@ VVP    = vvp
 TB_DIR = tb
 OUT    = sim_out
 RTL    = rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v \
-         rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/dma/dma_channel.v \
+         rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v \
          rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v
 
 # 官方模块（只读复用，不改动）——官方makefile MODULES清单去掉本项目未实例化的

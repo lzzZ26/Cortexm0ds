@@ -36,6 +36,17 @@ def fir_ref(c, x):
         y.append(acc)
     return y
 
+def gen_extra_set(tag, coeffs, xq):
+    """非对称黄金一套：系数量化Q1.15→双精度FIR（同一四段输入）→Q1.31落盘"""
+    cq = [q(v, 16) for v in coeffs]
+    yq = [q(v, 32) for v in fir_ref([v / 32768.0 for v in cq],
+                                   [v / 32768.0 for v in xq])]
+    with open(f"tb/data/coeff_{tag}_q15.hex", "w") as f:
+        f.write("\n".join(f"{v & 0xFFFF:04X}" for v in cq) + "\n")
+    with open(f"tb/data/golden_{tag}_q31.hex", "w") as f:
+        f.write("\n".join(f"{v & 0xFFFFFFFF:08X}" for v in yq) + "\n")
+    return cq, yq
+
 def main():
     random.seed(20261002)
     # 1) 系数：窗函数法低通，归一化使直流增益≈0.5（留6dB饱和余量）
@@ -73,6 +84,17 @@ def main():
         f.write("static const int   fir_golden[FIR_N] = {%s};\n" % ",".join(map(str, yq)))
     print("生成完成: coeff_q15.hex / input_q15.hex / golden_q31.hex / fir_golden.h")
     print("系数示例(前4):", cq[:4], " 输入示例(前4):", xq[:4], " 期望输出示例(前4):", yq[:4])
+    # 6) 非对称黄金两套（设计决策4：同一四段输入分别生成）：
+    #    ①随机系数（固定seed均匀分布，任意非对称——通用核合规主路径）
+    random.seed(20261019)
+    c_asym = [random.uniform(-1.0, 1.0) for _ in range(TAPS)]
+    #    ②大系数集（直流增益>1，专压饱和路径：全正0.5..1.0，和≈61）
+    random.seed(20261020)
+    c_gain = [random.uniform(0.5, 1.0) for _ in range(TAPS)]
+    for tag, cset in (("asym", c_asym), ("gain", c_gain)):
+        gen_extra_set(tag, cset, xq)
+    print("生成完成: coeff_asym_q15.hex / golden_asym_q31.hex / "
+          "coeff_gain_q15.hex / golden_gain_q31.hex")
 
 if __name__ == "__main__":
     main()
