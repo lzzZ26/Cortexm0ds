@@ -105,13 +105,16 @@ module tb_fir_core_para;
     end
   endtask
 
-  // clr脉冲（1拍）+比对状态复位（相起始用：清移位寄存器防上相样本污染）
+  // clr脉冲（1拍，NBA驱动）+比对状态复位（相起始用：清移位寄存器防上相样本污染）
+  // 注意：clr必须用非阻塞赋值——若用阻塞赋值在posedge的active区置1/清0，
+  // 与核always块在同一沿竞争，调度顺序不利时核整拍采样不到clr=1（实测：
+  // 中途CLR用例稳定失败、相位起始do_clr侥幸通过——delta竞争，非RTL缺陷）
   task do_clr;
     begin
       @(posedge clk);               // 收下在途输出（不计入本相）
-      clr = 1;
+      clr <= 1'b1;                  // NBA：核在下一沿可靠采样到1
       @(posedge clk);               // clr拍：核内移位寄存器/流水线全清
-      clr = 0;
+      clr <= 1'b0;
       @(posedge clk);
       out_cnt = 0; err_cnt = 0;
     end
@@ -215,9 +218,9 @@ module tb_fir_core_para;
     push_len = 300; push_n = 0; push_en = 1;
     wait (push_n == 300);
     repeat (30) @(posedge clk);       // 排空在途输出
-    clr = 1;
+    clr <= 1'b1;                      // NBA（delta竞争，见do_clr注释）
     @(posedge clk);                   // clr拍：核全清
-    clr = 0;
+    clr <= 1'b0;
     @(posedge clk);
     out_cnt = 0; err_cnt = 0;         // 中途清零后从头比对
     push_len = 1024; push_n = 0; push_en = 1;
