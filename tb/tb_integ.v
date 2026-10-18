@@ -173,8 +173,8 @@ module tb_integ;
     .R_VALID(sram_RVALID), .R_READY(sys_RREADY), .R_LAST(sram_RLAST),
     .R_DATA(sram_RDATA), .R_RESP(sram_RRESP));
 
-  // FIR（对称核，与soc_top同）
-  fir_top #(.CORE_TYPE(1)) u_fir (
+  // FIR（双核模式：para默认+CLR可切sym；与soc_top同）
+  fir_top #(.CORE_TYPE(3)) u_fir (
     .ACLK(ACLK), .ARESETn(ARESETn),
     .AW_SEL(fir_awsel), .AW_VALID(sys_AWVALID), .AW_READY(fir_AWREADY),
     .AW_SIZE(sys_AWSIZE), .AW_BURST(sys_AWBURST), .AW_LEN(sys_AWLEN),
@@ -246,12 +246,16 @@ module tb_integ;
 
   // ================= 激励数据 =================
   reg [15:0] coeff [0:81];
+  reg [15:0] coeff_asym [0:81];
   reg [31:0] in_mem [0:1023];
   reg [31:0] gmem [0:1023];
+  reg [31:0] gmem_asym [0:1023];
   initial begin
     $readmemh("tb/data/coeff_q15.hex", coeff);
+    $readmemh("tb/data/coeff_asym_q15.hex", coeff_asym);
     $readmemh("tb/data/input_q15.hex", in_mem);
     $readmemh("tb/data/golden_q31.hex", gmem);
+    $readmemh("tb/data/golden_asym_q31.hex", gmem_asym);
   end
 
   // ================= 激励与判定 =================
@@ -339,6 +343,72 @@ module tb_integ;
     end
     if (bad_cnt != 0)
       $fatal(1, "FAIL: FIR误差超标样本数=%0d（阈值0.1%%）", bad_cnt);
+    $display("集成-对称系数黄金比对通过");
+
+    // ============ 9) 非对称系数系统级用例（评委验收路径，答疑#18） ============
+    // 复用ch2/ch3（ch0/ch1的DONE位锁存不可清，无法判新完成——T15走读）
+    u_vip.vip_wdata[0] = 32'h1;
+    u_vip.axi_wr(32'h40020000, 8'd0, 2'b00, 3'b010);      // CTRL CLR（para模式）
+    for (blk = 0; blk < 6; blk = blk + 1) begin
+      for (i = 0; i < 16; i = i + 1)
+        u_vip.vip_wdata[i] = (blk * 16 + i < 82) ? {16'h0, coeff_asym[blk * 16 + i]} : 32'h0;
+      u_vip.axi_wr(32'h40020010 + blk * 64, 8'd15, 2'b01, 3'b010);
+    end
+    $display("集成-非对称82系数配置完成");
+
+    // ch2：SRAM→FIR DIN（FIXED_DST单拍，同ch0口径）
+    u_vip.vip_wdata[0] = 32'h20001000; u_vip.axi_wr(32'h40030040, 8'd0, 2'b00, 3'b010);
+    u_vip.vip_wdata[0] = 32'h40020008; u_vip.axi_wr(32'h40030044, 8'd0, 2'b00, 3'b010);
+    u_vip.vip_wdata[0] = 32'd1024;     u_vip.axi_wr(32'h40030048, 8'd0, 2'b00, 3'b010);
+    u_vip.vip_wdata[0] = 32'h0000020B; u_vip.axi_wr(32'h4003004C, 8'd0, 2'b00, 3'b010); // GO
+
+    // 等首样本入DIN再GO ch3（防DOUT空读挂起，与固件GO顺序一致）
+    poll = 0;
+    u_vip.axi_rd(32'h40020004, 8'd0, 2'b00, 3'b010);
+    while ((u_vip.vip_rdata[0] & 32'h1) && (poll < 100000)) begin
+      u_vip.axi_rd(32'h40020004, 8'd0, 2'b00, 3'b010);
+      poll = poll + 1;
+    end
+    if (poll >= 100000) $fatal(1, "FAIL: 非对称用例DIN首样本等待超时");
+
+    // ch3：FIR DOUT→SRAM（FIXED_SRC，FSIZE=2）
+    u_vip.vip_wdata[0] = 32'h4002000C; u_vip.axi_wr(32'h40030060, 8'd0, 2'b00, 3'b010);
+    u_vip.vip_wdata[0] = 32'h20002000; u_vip.axi_wr(32'h40030064, 8'd0, 2'b00, 3'b010);
+    u_vip.vip_wdata[0] = 32'd1024;     u_vip.axi_wr(32'h40030068, 8'd0, 2'b00, 3'b010);
+    u_vip.vip_wdata[0] = 32'h00000207; u_vip.axi_wr(32'h4003006C, 8'd0, 2'b00, 3'b010); // GO
+
+    // 轮询ch2/ch3 STATUS bit1=DONE
+    poll = 0; s0 = 32'h0; s1 = 32'h0;
+    while ((((s0 & 32'h2) == 0) || ((s1 & 32'h2) == 0)) && (poll < 1000000)) begin
+      u_vip.axi_rd(32'h40030050, 8'd0, 2'b00, 3'b010); s0 = u_vip.vip_rdata[0];
+      u_vip.axi_rd(32'h40030070, 8'd0, 2'b00, 3'b010); s1 = u_vip.vip_rdata[0];
+      poll = poll + 1;
+    end
+    if (poll >= 1000000) $fatal(1, "FAIL: 非对称用例DMA等待超时 ch2=%h ch3=%h", s0, s1);
+    $display("集成-非对称DMA搬运完成（ch2=%h ch3=%h）", s0, s1);
+
+    // 读回out_buf与golden_asym比对（同阈值|hw-ref|>|ref|/1024）
+    bad_cnt = 0;
+    for (blk = 0; blk < 64; blk = blk + 1) begin
+      u_vip.axi_rd(32'h20002000 + blk * 64, 8'd15, 2'b01, 3'b010);
+      for (i = 0; i < 16; i = i + 1) begin : cmp_asym
+        reg signed [31:0] hw_a, g_a, d_a;
+        reg [31:0] a_da, a_ga;
+        hw_a = u_vip.vip_rdata[i];
+        g_a  = gmem_asym[blk * 16 + i];
+        d_a  = hw_a - g_a;
+        a_da = (d_a < 0) ? -d_a : d_a;
+        a_ga = (g_a < 0) ? -g_a : g_a;
+        if (a_da > (a_ga >> 10)) begin
+          bad_cnt = bad_cnt + 1;
+          if (bad_cnt <= 8)
+            $display("INTEG-ASYM-ERR i=%0d hw=%h ref=%h", blk * 16 + i, hw_a, g_a);
+        end
+      end
+    end
+    if (bad_cnt != 0)
+      $fatal(1, "FAIL: 非对称FIR误差超标样本数=%0d（阈值0.1%%）", bad_cnt);
+    $display("集成-非对称系数系统级黄金比对<0.1%%通过");
 
     if (viol) $fatal(1, "FAIL: 协议检查器有违规");
     $display("PASS: 集成验证（无CPU）——SRAM往返+82系数配置+1024样本FIR滤波黄金比对<0.1%%+协议零违规");

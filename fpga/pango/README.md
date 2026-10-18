@@ -36,3 +36,24 @@
   按 `rtl/fpga/axi_rom.v` 头注释改用厂商 IP 生成 `.coe`（接口不变）。
 - 仿真已验证 ROM 路径（`mingw32-make -f Makefile.fir sim_tb_soc_smoke_rom`，
   CPU 从 axi_rom 启动输出 Hello world），FPGA 侧仅剩工具链与板级流程。
+
+## 5. CORE_TYPE 决策矩阵（板卡乘法器预算）
+
+`fir_top` 的 `CORE_TYPE` 参数选择取决于板卡 DSP/APM 数量：
+
+| 板卡 | 乘法器预算 | 推荐 CORE_TYPE |
+|---|---|---|
+| **PGL50H（盘古50K，已定案）** | 84 APM | **3**（双核：para 82 走 DSP + sym 41 走 LUT；若 LUT 乘法器推断失败→备选手写乘法器结构；再不行→2） |
+| PG2L100H（Logos-2） | ~180 APM | 3（双核全 DSP，零改动切换） |
+| A7-35T（90 DSP） | 紧 | 2（82 乘法器 ≤90） |
+
+说明：
+- CORE_TYPE=3 时通用并行核（para，任意非对称系数、1样本/拍）为默认合规主路径；
+  对称核（sym，41乘加）为可选资源优化分支，CPU 写 CTRL bit1=1 且 bit0=1（CLR）
+  切换，模式位在 CLR 拍锁存。
+- PGL50H 上通用核独占 82/84=97.6% APM，决赛资源利用率（DSP 项 30% 权重）
+  必然偏低——如实记录到指标表；答辩口径："82 乘法器为满足'任意非对称系数+
+  1样本/拍'的架构下限"。
+- 对称核的 41 个乘法器用 `(* use_dsp = "no" *)` 属性禁止 PDS 推断为 DSP
+  （`rtl/fir/fir_core_sym.v`）；PDS 若不认可该属性，改用备选手写
+  carry-save 乘法器结构（接口不变）。

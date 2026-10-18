@@ -347,7 +347,7 @@ module soc_top #(
     .GPIOINT(gpio1_intr), .COMBINT(gpio1_combintr));
 
   // ================= FIR / DMA =================
-  fir_top #(.CORE_TYPE(1)) u_fir (
+  fir_top #(.CORE_TYPE(3)) u_fir (
     .ACLK(ACLK), .ARESETn(ARESETn),
     .AW_SEL(fir_awsel), .AW_VALID(sys_AWVALID), .AW_READY(fir_AWREADY),
     .AW_SIZE(sys_AWSIZE), .AW_BURST(sys_AWBURST), .AW_LEN(sys_AWLEN),
