@@ -27,7 +27,15 @@
 
 ### 板子结论（答疑#3/#4/#7/#14）
 
-Artix-200T、Zynq-7020（纯PL）、Vivado 官方均答复可以，"差不多就行"；初赛建议提前准备板子（FPGA综合验证 20 分）。团队已选盘古50K（PGL50H，Logos 一代）——PDS 支持，合规无忧。**注意 PGL50H/A7-35T 的 DSP 数量有限，双核（82+41=123 乘法器）可能放不下 → 见任务 22 的 CORE_TYPE 决策矩阵。**
+Artix-200T、Zynq-7020（纯PL）、Vivado 官方均答复可以，"差不多就行"；初赛建议提前准备板子（FPGA综合验证 20 分）。**板卡已定案：盘古50K（PGL50H，Logos 一代，84 个 APM 乘法器，42,800 LUT5）**——用户确认不换板。
+
+## 设计决策（2026-10-19 细化已确认，执行时不许推翻）
+
+1. **CLR 修复**：现有核（fir_core/fir_core_sym）没有 clr 输入——fir_top 的 CTRL 清零只清 FIFO，核内 82 级移位寄存器和流水线保留旧样本（当前单轮演示未暴露；双核切换必暴露）。**三个核统一加 `clr` 输入**（1 拍脉冲清移位寄存器+流水线），fir_top 的 CLR 脉冲同时打给核与 FIFO。
+2. **模式切换语义**：CTRL bit1（0=通用核，1=对称核）**在 CLR 脉冲时锁存生效**——切换必然伴随全清，硬件上杜绝"切模式不清理"；fir_top CORE_TYPE=3 双核，0/1/2 单核行为不变。
+3. **对称核实现载体（受 PGL50H 84 APM 约束）**：双核 82+41=123 乘法器 > 84 放不下。**采用方案 ii**：通用核 82 个乘法器走 DSP（82/84=97.6%，已尽人事）；**对称核 41 个乘法器走 LUT 实现**（~6K LUT5，LUT 总利用率 ~45%）——加 PDS 综合属性禁止对称核乘法器推断为 DSP；若属性不被 PDS 认可（推断后爆仓），**备选=手写乘法器结构**（参数化 carry-save 乘法器模块）。对称核做成独立 generate 块，接口不变——未来换 PG2L100H 可零改动换回全 DSP 双核。
+4. **非对称黄金数据两套**（gen_fir_golden.py 扩展）：①随机系数（固定 seed，均匀分布）；②**大系数集**（直流增益>1，专压饱和路径）。同一四段输入分别生成 golden。
+5. **cfg 广播**：双核各存系数副本，cfg 写同时打两核（对称核天然忽略 cfg_addr≥41，两核系数一致）。
 
 ---
 
@@ -35,12 +43,13 @@ Artix-200T、Zynq-7020（纯PL）、Vivado 官方均答复可以，"差不多就
 
 **Files:** Create: `rtl/fir/fir_core_para.v`；Test: `tb/tb_fir_core_para.v`；数据：`tb/data/coeff_asym_q15.hex`、`tb/data/golden_asym_q31.hex`（工具生成）
 
-**Interfaces（与 fir_core_sym 完全同构，直接替换可用）：**
+**Interfaces（与 fir_core_sym 同构+新增 clr，直接替换可用）：**
 ```verilog
 module fir_core_para #(parameter TAPS = 82, CW = 16, DW = 16)(
     input  wire        ACLK, ARESETn,
+    input  wire        clr,                // 1拍脉冲：清移位寄存器+流水线（设计决策1）
     input  wire        cfg_we,             // 系数配置写使能
-    input  wire [9:0]  cfg_addr,           // 系数序号 0..81
+    input  wire [9:0]  cfg_addr,           // 系数序号 0..81（注意：sym核只认0..40，本核必须全82）
     input  wire [15:0] cfg_wdata,          // Q1.15 系数
     input  wire        din_valid,
     output wire        din_ready,          // =!stall（与sym核同语义）
@@ -50,6 +59,7 @@ module fir_core_para #(parameter TAPS = 82, CW = 16, DW = 16)(
     output reg  [31:0] dout                // Q1.31 输出
 );
 ```
+（clr 为新增端口；fir_core/fir_core_sym 也同步加 clr——接口小改，现有 TB 实例化处补连接）
 
 **实现要点（照抄/移植 fir_core_sym 的成熟结构，台账 T8 裁决已验）：**
 - 82 深移位寄存器链 x[0..81]（每拍 din_valid 时移入新样本）
@@ -63,17 +73,19 @@ module fir_core_para #(parameter TAPS = 82, CW = 16, DW = 16)(
 - 系数配置：cfg_we 时 `coef[cfg_addr] <= cfg_wdata`（82 个独立寄存器，任意非对称 ✓）
 
 **测试（TDD 循环，Step 1 TB 先行）：**
-1. 写 `tools/gen_fir_golden.py` 扩展：新增**非对称系数集**（随机 Q1.15，固定 seed，不归一化或任意归一化）→ 生成 `tb/data/coeff_asym_q15.hex`（82 行）与 `tb/data/golden_asym_q31.hex`（1024 样本，同一四段输入）；原对称系数与 golden 保留
+1. 写 `tools/gen_fir_golden.py` 扩展：新增**两套非对称系数集**（设计决策4）——①随机 Q1.15（固定 seed，均匀分布）→ `tb/data/coeff_asym_q15.hex`+`golden_asym_q31.hex`；②大系数集（直流增益>1，压饱和路径）→ `coeff_gain_q15.hex`+`golden_gain_q31.hex`。原对称系数与 golden 保留
 2. `tb/tb_fir_core_para.v`：参考 tb_fir_core_sym 结构（always 块 NBA 逐沿推进 din——T8 裁决：阻塞赋值会丢首样本；dout_ready 每拍随机 always 驱动+排空 force_accept——T6 裁决）
    - 用例A：对称系数集（coeff_q15.hex+golden_q31.hex）1024 样本 <0.1%
-   - 用例B：**非对称系数集**（coeff_asym+golden_asym）1024 样本 <0.1%——本任务的核心证明
-   - 用例C：吞吐断言 gap_bad（连续段输出间隔恒 1 拍，T8 裁决的断言结构）
-   - 用例D：cfg 逐系数写与回归读（cfg 时序 2 沿保持——T6 裁决：cfg 推送要跨完整时钟沿稳定）
+   - 用例B：**非对称随机系数集** 1024 样本 <0.1%——本任务的核心证明
+   - 用例C：**大系数集**（饱和路径+溢出钳位断言）
+   - 用例D：吞吐断言 gap_bad（连续段输出间隔恒 1 拍，T8 裁决的断言结构）
+   - 用例E：**中途 CLR**——跑一段后 clr 脉冲，再跑全序列，黄金比对不受污染（验证设计决策1）
+   - 用例F：cfg 逐系数写与回归读（cfg 时序 2 沿保持——T6 裁决：cfg 推送要跨完整时钟沿稳定）
 3. 红灯：`mingw32-make -f Makefile.fir sim_tb_fir_core_para` → module not found
 4. 实现 → 绿灯；RTL 加入 Makefile.fir 的 RTL 列表
 5. 提交：`feat: 通用全并行FIR核（82乘加，任意系数1样本/拍，非对称黄金回归）`
 
-**验收：** sim_tb_fir_core_para 全绿（对称+非对称双黄金 1024 样本 <0.1% + 吞吐 1 样本/拍）。
+**验收：** sim_tb_fir_core_para 全绿（对称+非对称+大系数三套黄金 1024 样本 <0.1% + 吞吐 1 样本/拍 + CLR 无污染）。
 
 ---
 
@@ -83,15 +95,16 @@ module fir_core_para #(parameter TAPS = 82, CW = 16, DW = 16)(
 
 **设计：**
 - `CORE_TYPE` 参数扩展：`0=serial（串行核）1=sym（对称核）2=para（通用并行核）3=dual（para+sym 运行时可选）`
-- CORE_TYPE=3 时同时例化 para 与 sym 两个核：
-  - din 扇出到两核（din_valid 只给**当前选中**核——未选中核 din_valid 恒 0，防止其空转；两个核共享 cfg 通道同时写同一组 coef 寄存器？**不**——para 和 sym 各存自己的系数副本，cfg 写同时打到两核，保证切换后系数一致）
+- CORE_TYPE=3 时同时例化 para 与 sym 两个核（**对称核为独立 generate 块，实现载体=设计决策3：LUT 乘法器+PDS 禁止 DSP 推断属性，备选手写乘法器结构**）：
+  - din 扇出到两核（din_valid 只给**当前选中**核——未选中核 din_valid 恒 0，防止其空转；cfg 写同时打到两核各自的系数副本，保证切换后系数一致——设计决策5）
   - dout 按模式位 mux；dout_ready 反压只回给当前选中核（未选中核 dout_ready 接 0 使其冻结，不产生伪输出）
-  - 模式选择：CTRL 寄存器 bit1（bit0=CLR 已有）：0=para（**默认，合规主路径**），1=sym（创新优化分支）；模式切换与 CLR 一样即时生效
-- CORE_TYPE=0/1/2 行为不变（单核，现有 TB 回归必须保持绿）
+  - 模式选择：CTRL 寄存器 bit1（bit0=CLR 已有）：0=para（**默认，合规主路径**），1=sym（创新优化分支）；**模式位在 CLR 脉冲时锁存生效**（设计决策2——切换必然全清双核，杜绝脏历史样本）
+  - CLR 清零范围（设计决策1）：FIFO（原有）+ 两个核的 clr 输入（新增——核内移位寄存器/流水线全清；fir_core/fir_core_sym 也补 clr 端口）
+- CORE_TYPE=0/1/2 行为不变（单核，现有 TB 回归必须保持绿；因核接口加了 clr，现有 TB 实例化处补 `.clr(1'b0)` 或相应连接）
 
 **测试：**
-- tb_fir_top 增补：CORE_TYPE=3 实例——①默认模式（para）非对称系数黄金回归；②写 CTRL bit1 切 sym 模式，对称系数黄金回归+吞吐；③切回 para 再验一次；④现有 CORE_TYPE=1 用例不动
-- 红灯→绿灯；提交：`feat: FIR从机双核模式（通用并行核默认+对称核可选优化分支）`
+- tb_fir_top 增补：CORE_TYPE=3 实例——①默认模式（para）非对称随机系数黄金回归；②写 CTRL bit1+CLR 切 sym 模式，对称系数黄金回归+吞吐；③CLR 切回 para 再验一次（验证切换无污染）；④大系数集饱和用例；⑤现有 CORE_TYPE=1 用例不动
+- 红灯→绿灯；提交：`feat: FIR从机双核模式（通用并行核默认+对称核可选优化分支，CLR语义扩展）`
 
 **验收：** sim_tb_fir_top 全绿（含双模切换与非对称用例）。
 
@@ -105,12 +118,13 @@ module fir_core_para #(parameter TAPS = 82, CW = 16, DW = 16)(
 1. soc_top 的 fir_top 实例改 `#(.CORE_TYPE(3))`；固件不改（对称系数，默认 para 模式跑通即证明兼容；若固件要演示对称优化分支，加一行 CTRL bit1 写 1——可选）
 2. tb_integ 增补：**非对称系数系统级用例**——VIP 配 coeff_asym_q15.hex → 1024 样本 → DMA 搬运 → 读回与 golden_asym_q31.hex 比对 <0.1%（这就是评委可能的验收路径，必须系统级证明）
 3. tb_soc 回归（固件路径不动，必须保持绿——注意 tb_soc 的 out_buf 黄金比对用 golden_q31.hex，对称系数，para 模式结果与 sym 模式一致，比对应仍全过）
-4. **CORE_TYPE 决策矩阵写进 fpga/pango/README.md**：
-   | 板卡 | DSP 预算 | 推荐 CORE_TYPE |
+4. **CORE_TYPE 决策矩阵写进 fpga/pango/README.md**（板卡已定案 PGL50H，见设计决策3）：
+   | 板卡 | 乘法器预算 | 推荐 CORE_TYPE |
    |---|---|---|
-   | PG2L100H（Logos-2，100K级） | 充足 | 3（双核，演示创新分支） |
-   | PGL50H（Logos 一代） | 按综合结果定 | 3 优先，放不下降 2（只留通用核） |
+   | **PGL50H（盘古50K，已定案）** | 84 APM | 3（双核：para 82 走 DSP + sym 41 走 LUT；若 LUT 乘法器推断失败→备选手写乘法器结构；再不行→2） |
+   | PG2L100H（Logos-2） | ~180 APM | 3（双核全 DSP，零改动切换） |
    | A7-35T（90 DSP） | 紧 | 2（82 乘法器 ≤90） |
+   注意：PGL50H 上通用核独占 82/84=97.6% DSP，决赛资源利用率 DSP 项（30% 权重）必然难看——如实记录到指标表，答辩口径"82 乘法器为满足'任意非对称系数+1样本/拍'的架构下限"。
 5. 全量回归：`mingw32-make -f Makefile.fir regression`（15 个 TB 全绿）
 6. 提交：`feat: 系统集成通用并行FIR核（非对称系数系统级黄金回归）`
 
