@@ -40,7 +40,7 @@ module tb_dma_channel;
     .R_VALID(v_R_VALID), .R_READY(v_R_READY), .R_DATA(v_R_DATA), .R_RESP(v_R_RESP), .R_LAST(v_R_LAST));
 
   dma_channel u_dma (
-    .clk(ACLK), .rstn(ARESETn),
+    .ACLK(ACLK), .ARESETn(ARESETn),
     .cfg_src(cfg_src), .cfg_dst(cfg_dst), .cfg_len(cfg_len), .cfg_next(cfg_next),
     .cfg_ctrl(cfg_ctrl), .cfg_load(cfg_load),
     .busy_o(busy_o), .done_o(done_o), .err_o(err_o), .req_o(req_o),
