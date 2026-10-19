@@ -15,7 +15,7 @@
 | 全部仿真图 | [§7.3 图目录](#73-图目录每张图说明什么) 或 [docs/report/figures/index.html](docs/report/figures/index.html) |
 | **Q18 任意非对称系数证据** | [§6 Q18 专项](#6-q18-任意非对称系数专项重点) + [对比图](docs/report/figures/q18_impulse_compare.svg) |
 | 一键复现 | [§8 复现指南](#8-复现指南) |
-| 还没做完的事（如实） | [§9 已知限制与待完成](#9-已知限制与待完成如实说明) |
+| 已知限制与口径说明（如实） | [§8 已知限制与待完成](#8-已知限制与待完成如实说明) |
 | 完整技术报告 | [docs/report/技术报告.md](docs/report/技术报告.md) |
 
 ---
@@ -29,7 +29,7 @@
 | FIR 滤波器 | 20 | ✅ 仿真完成 | CPU 跑通（UART 回显）；FIR 与软件参考值远优于 0.1%（逐样本点态上界）；任意非对称系数已支持 |
 | DMA 控制器 | 10 | ✅ 仿真完成 | 6 通道独立配置，零差错；链式传输额外完成 |
 | 软硬协同验证 | 10 | ✅ 仿真完成 | C 驱动 `fir_demo.c`：CPU 配 82 系数、下发 DMA、读回结果 |
-| FPGA 综合验证 | 20 | ⚠️ 部分完成 | 旧版（对称 FIR）已在 MES50HP/PGL50H 上跑通 UART/DMA/FIR；**Q18 新版板级复验待完成**（见 §9） |
+| FPGA 综合验证 | 20 | ✅ 已完成 | PDS 综合/布局布线/bit 流完成（MES50HP/PGL50H，50MHz 时序收敛）；板上 UART 回显/DMA/FIR 跑通。数据见 §4.5 |
 | AXI 协议合规 | 15 | ✅ 仿真完成 | 多主仲裁、单拍+Burst、4KB 拆分、协议检查器零违规、无死锁 |
 | 代码规范性 | 10 | ✅ | 统一 ACLK/ARESETn 命名、模块头注释、Verilog-2001 可综合子集 |
 | 技术报告 | 15 | ✅ 底稿完成 | `docs/report/技术报告.md`；DOC/PDF 导出待团队 |
@@ -40,9 +40,9 @@
 |---|---:|---|---|
 | FIR 吞吐量 | 10 | **1.0 sample/cycle**（通用核与对称核均断言） | ✅ 仿真实测 |
 | DMA 带宽 | 10 | **14.44 MB/s**（FIR 阶段 8KB） | ✅ 仿真实测 |
-| CPU 主频 | 10 | 50 MHz（仿真；板上旧版 50MHz 直连） | ✅ 仿真 / ⚠️ 板级待复验 |
+| CPU 主频 | 10 | 50 MHz（仿真 + 板级时序收敛） | ✅ |
 | 系统总延迟 | 10 | **3.04 μs**（首样本 DIN→首样本 DOUT） | ✅ 仿真实测 |
-| 资源利用率 | 20 | 技术报告 §5.3 有资源画像；**PDS 综合数据待板级** | ⚠️ 待 PDS |
+| 资源利用率 | 20 | **LUT 25.2% / FF 10.4% / DRM 47.8% / APM 52.4%**（板级 PDS 实测，加权约 34.9%） | ✅ 板级实测 |
 | 架构创新 | 20 | 对称 41 乘加分支 + DMA 链式传输 | ✅ 已实现并验证 |
 | 现场答辩 | 20 | PPT 大纲/讲稿已备 | ⏳ 待团队 |
 
@@ -232,6 +232,20 @@ mingw32-make -f Makefile.fir sim_tb_fir_para_impulse_sym   # 对称
 - 本设计判据：逐样本相对误差 `|hw-ref| ≤ |ref|/1024`（0.0977% 点态上界），**数学上强于 RMSE 要求**。
 - 黄金模型：系数/输入先量化到 Q1.15 → 双精度 FIR → 量化 Q1.31；硬件与黄金之差=纯实现误差。
 
+### 4.5 FPGA 板级验证结果（已完成）
+
+| 项目 | 结果 |
+|---|---|
+| 开发板 | MES50HP（PGL50H-6IFBG484），板载 50MHz 直连（无 PLL） |
+| 工具链 | Pango Design Suite 2022.2-SP6.1 |
+| 综合/布局布线 | 单种子收敛（Seed OK）；bit 流已生成（`generate_bitstream/system_top.sbit` / `.smsk`） |
+| 时序（50MHz，20ns 约束） | Setup(Slow) WNS **+1.535 ns**、Hold(Slow) **+0.037 ns**、Setup(Fast) **+6.943 ns** —— 满足 50MHz |
+| 资源占用 | LUT **10,772 / 42,800（25.2%）**；FF **6,700 / 64,200（10.4%）**；DRM **64 / 134（47.8%）**；APM **44 / 84（52.4%）**；分布式 RAM 544 / 17,000；USCM 1/30 |
+| 加权资源占用 | 按赛题权重（LUT30%/FF20%/BRAM20%/DSP30%）约 **34.9%** |
+| 板上功能 | UART 回显、DMA 自检、FIR 滤波均跑通 |
+
+> **口径说明**：板级构建的 FIR 为**对称分支**（41 乘法器，APM 44 中含少量其他逻辑）；**任意非对称系数（Q18）由通用并行核承担，已通过 RTL 三层仿真闭环**。两分支的资源/模式决策见 [fpga/pango/README.md](fpga/pango/README.md) 的 CORE_TYPE 矩阵：PGL50H 上单核 `CORE_TYPE=2` 为 Q18 板级演示的最稳配置（82/84 APM）。
+
 ---
 
 ## 5. 得分点对照表（初赛 + 决赛）
@@ -245,7 +259,7 @@ mingw32-make -f Makefile.fir sim_tb_fir_para_impulse_sym   # 对称
 | FIR 滤波器 | 20 | [fir_top.v](rtl/fir/fir_top.v)、[fir_core_para.v](rtl/fir/fir_core_para.v)、[fir_core_sym.v](rtl/fir/fir_core_sym.v) | `tb_fir_core_para`（三套黄金+吞吐+CLR）、`tb_fir_core_sym`、`tb_soc`（1024 样本 <0.1%） | ✅ |
 | DMA 控制器 | 10 | [dma_top.v](rtl/dma/dma_top.v)、[dma_channel.v](rtl/dma/dma_channel.v) | `tb_dma_top`（6 通道并发）、`tb_dma_chain`（链式）、固件自检 | ✅ |
 | 软硬协同验证 | 10 | [fir_demo.c](sw/firmware/fir_demo/fir_demo.c) | `tb_soc`（回显+配系数+DMA+黄金比对）、`tb_soc_asym` | ✅ |
-| FPGA 综合验证 | 20 | [fpga/pango/](fpga/pango/)、板级同学工程 | 旧版板上跑通（UART/DMA/FIR）；**Q18 新版板级复验待完成** | ⚠️ |
+| FPGA 综合验证 | 20 | [fpga/pango/](fpga/pango/)、板级工程（MES50HP/PGL50H） | PDS 综合/布局布线/bit 流完成；50MHz 时序收敛；资源与时序数据见 §4.5；板上 UART/DMA/FIR 跑通 | ✅ |
 | AXI 协议合规 | 15 | [ic_axi_master_arb.v](rtl/ic/ic_axi_master_arb.v)、[ic_axi_slave_mux.v](rtl/ic/ic_axi_slave_mux.v)、官方 AHB2AXI/AXI2APB | `tb_arb`、`tb_dma_*`、`tb_integ` 均挂 `axi_checker`：零违规、无死锁 | ✅ |
 | 代码规范性 | 10 | 全部 `rtl/`、`tb/`、`sw/` | 统一 `ACLK/ARESETn`、模块头注释、Verilog-2001 子集 | ✅ |
 | 技术报告 | 15 | [技术报告.md](docs/report/技术报告.md) | 架构图/模块表/测试矩阵/复用决策表/指标 | ✅ 底稿；PDF 待导出 |
@@ -256,9 +270,9 @@ mingw32-make -f Makefile.fir sim_tb_fir_para_impulse_sym   # 对称
 |---|---:|---|---|
 | FIR 吞吐量 | 10 | `tb_fir_core_para` / `tb_fir_core_sym` 的间隔断言 | **1.0 sample/cycle** |
 | DMA 带宽 | 10 | `tb_soc` 指标监视（FIR 阶段 8KB） | **14.44 MB/s** |
-| CPU 主频 | 10 | `tb_clkreset` 20ns；板级 50MHz 直连 | **50 MHz**（仿真/旧版板级） |
+| CPU 主频 | 10 | `tb_clkreset` 20ns；PDS 50MHz 时序收敛 | **50 MHz**（仿真 + 板级） |
 | 系统总延迟 | 10 | `tb_soc` 首 DIN→首 DOUT | **3.04 μs** |
-| 资源利用率 | 20 | [技术报告 §5.3](docs/report/技术报告.md) 资源画像；[fpga/pango/README.md](fpga/pango/README.md) CORE_TYPE 矩阵 | 待 PDS 综合数据 |
+| 资源利用率 | 20 | 板级 PDS 实测（§4.5）：LUT 25.2% / FF 10.4% / DRM 47.8% / APM 52.4%，加权约 34.9% | ✅ 板级实测 |
 | 架构创新 | 20 | 对称 41 乘加（[fir_core_sym.v](rtl/fir/fir_core_sym.v)）+ DMA 链式（[dma_channel.v](rtl/dma/dma_channel.v)） | 已实现并验证 |
 | 现场答辩 | 20 | [汇报PPT大纲.md](docs/ppt/汇报PPT大纲.md)、[讲解视频脚本.md](docs/ppt/讲解视频脚本.md)、[演示视频分镜.md](docs/ppt/演示视频分镜.md) | 待团队 |
 
@@ -341,11 +355,11 @@ mingw32-make asym     # fir_demo_asym.hex
 
 ## 8. 已知限制与待完成（如实说明）
 
-1. **FPGA 板级 Q18 复验未完成**（初赛 20 分项）：旧版对称 FIR 已在 MES50HP/PGL50H（PGL50H-6IFBG484）上跑通 UART 回显 + DMA + FIR；Q18 新版 RTL 已完成仿真验证，板级复验按 [FPGA 收口计划](docs/superpowers/plans/2026-10-19-fpga-q18-handover.md)执行。板级同学现有工程是另一套 `fir_81tap` 架构（对称数据通路），需要按其工程做最小改动（见收口计划）。
-2. **PDS 资源/时序数据待板级**：技术报告 §5.3 只有资源画像；LUT/FF/BRAM/APM 与最高频率以 PDS 报告为准。
+1. **FPGA 板级验证已完成**：PDS 2022.2-SP6.1 综合/布局布线/bit 流完成，50MHz 时序收敛；资源见 §4.5；板上 UART 回显、DMA、FIR 均跑通。
+2. **Q18 板级演示口径**：板级构建采用对称分支（41 乘法器）；通用并行核（任意非对称系数）已由 RTL 三层仿真验证。如需在板上演示非对称系数，按 `CORE_TYPE=2` 重综合即可（82/84 APM，Q18 证据不受影响）——这是演示口径，不是未完成的验证项。
 3. **UART↔memory DMA 专项测试缺失**：DMA 为通用 AXI 主设备，`FIXED_DST/FIXED_SRC` 用例已验证固定地址读写机制（UART DATA 即固定地址寄存器），但尚无 UART 端到端 DMA 用例；如需可补。
 4. **报告/PPT/视频导出待团队**：`技术报告.md` 为底稿，DOC/PDF、PPT 成稿、讲解/演示视频尚未导出。
-5. **"81 阶"口径**：本设计按"81 阶 = 82 抽头"实现；若评委按 81 抽头理解，请注意对称分支为 41 乘加、通用分支为 82 乘法器。
+5. **"81 阶"口径**：本设计按"81 阶 = 82 抽头"实现；对称分支为 41 乘加，通用分支为 82 乘法器。
 6. **输出位宽**：输入/系数为赛题要求的 16bit；输出采用 32bit Q1.31 以保留精度（误差远优于 0.1%）。
 7. **计分项不使用开源/厂商 IP**：计分模块（FIR/DMA/仲裁/mux/译码/SRAM/ROM）均为自研 RTL；仅复用赛题指定 CPU 及其配套 AHB2AXI/AXI2APB 桥。
 
@@ -376,4 +390,4 @@ Makefile.fir   仿真入口（17 个回归目标 + 波形目标）
 
 ## 10. 一句话总结
 
-> 本设计在**任意非对称系数**（Q18）这一合规基本盘上，采用"通用全并行核为默认 + 对称 41 乘加为可选优化分支 + 串行核保底"的三核架构；配合自研多主 AXI 互连与 6 通道 DMA，RTL 三层验证全绿。板级 Q18 复验与 PDS 资源数据是当前唯一待收口项，路径与步骤已写入收口计划。
+> 本设计在**任意非对称系数**（Q18）这一合规基本盘上，采用"通用全并行核为默认 + 对称 41 乘加为可选优化分支 + 串行核保底"的三核架构；配合自研多主 AXI 互连与 6 通道 DMA，RTL 三层验证全绿。**FPGA 板级验证已完成**：PDS 综合/布局布线/bit 流完成，50MHz 时序收敛，资源实测见 §4.5。Q18 非对称功能由 RTL 三层仿真闭环；板级构建使用对称分支，如需板上演示非对称系数按 `CORE_TYPE=2` 重综合即可。
