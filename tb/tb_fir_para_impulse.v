@@ -35,12 +35,18 @@ module tb_fir_para_impulse #(
     $readmemh(GOLDEN_FILE, golden);
   end
 
-  // VCD：在冲激开始前才启动dump，只录关键信号——避免把前面的系数配置段
-  // 和字符串参数（文件名）也录进去导致波形看起来全是0/x
+  // 仅用于VCD的干净probe：只含关键信号，避免字符串参数/大数组进波形
+  // （GTKWave对$var parameter显示为xxxx，会误以为整条波形无效）
+  q18_wave_probe u_probe (
+    .clk(clk), .rstn(rstn), .clr(clr),
+    .din_valid(din_valid), .din_ready(din_ready), .din(din),
+    .dout_valid(dout_valid), .dout_ready(dout_ready), .dout(dout));
+
+  // VCD：在冲激开始前才启动dump——避免把前面的系数配置段也录进去
   task start_dump;
     begin
       $dumpfile(VCD_FILE);
-      $dumpvars(1, tb_fir_para_impulse);
+      $dumpvars(0, tb_fir_para_impulse.u_probe);
     end
   endtask
 
@@ -103,4 +109,18 @@ module tb_fir_para_impulse #(
   initial begin
     #5000000 $fatal(1, "FAIL: Q18波形仿真超时");
   end
+endmodule
+
+// 波形探针（仅端口，无逻辑）：给GTKWave一个只含关键信号的干净scope
+module q18_wave_probe (
+  input wire        clk,
+  input wire        rstn,
+  input wire        clr,
+  input wire        din_valid,
+  input wire        din_ready,
+  input wire [15:0] din,
+  input wire        dout_valid,
+  input wire        dout_ready,
+  input wire [31:0] dout
+);
 endmodule
