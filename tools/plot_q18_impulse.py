@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-# plot_q18_impulse.py : Q18验收图——非对称系数冲激响应（RTL仿真输出）
-# 输入：tb/data/coeff_asym_q15.hex（系数）、sim_out/q18_impulse.csv（硬件仿真输出）
-# 输出：docs/report/figures/q18_impulse_asym.svg（零依赖，浏览器可看）
+# plot_q18_impulse.py : Q18验收图——对称/非对称系数冲激响应（RTL仿真输出）
+# 输入：tb/data/coeff_q15.hex、coeff_asym_q15.hex；
+#       sim_out/q18_impulse_sym.csv、sim_out/q18_impulse.csv
+# 输出：docs/report/figures/q18_impulse_sym.svg
+#       docs/report/figures/q18_impulse_asym.svg
+#       docs/report/figures/q18_impulse_compare.svg（上下对比）
+# 零依赖，纯标准库；浏览器直接打开。
 import os
 
 ROOT = os.path.join(os.path.dirname(__file__), "..")
-COEF = os.path.join(ROOT, "tb", "data", "coeff_asym_q15.hex")
-CSV  = os.path.join(ROOT, "sim_out", "q18_impulse.csv")
-OUT  = os.path.join(ROOT, "docs", "report", "figures", "q18_impulse_asym.svg")
+DATA = os.path.join(ROOT, "tb", "data")
+SIM  = os.path.join(ROOT, "sim_out")
+OUT  = os.path.join(ROOT, "docs", "report", "figures")
 
-def read_coeff():
+
+def read_coeff(name):
     vals = []
-    with open(COEF) as f:
+    with open(os.path.join(DATA, name)) as f:
         for line in f:
             line = line.strip()
             if line:
@@ -21,103 +26,134 @@ def read_coeff():
                 vals.append(v / 32768.0)
     return vals
 
-def read_csv():
+
+def read_csv(path):
     ys = []
-    with open(CSV) as f:
+    with open(path) as f:
         next(f)
         for line in f:
             line = line.strip()
             if not line:
                 continue
-            n, h = line.split(",")
+            _, h = line.split(",")
             v = int(h, 16)
             if v >= 0x80000000:
                 v -= 0x100000000
             ys.append(v / float(2 ** 31))
     return ys
 
-C = read_coeff()
-Y = read_csv()
-N = len(Y)
 
-W, H = 900, 420
-ML, MR, MT, MB = 70, 30, 70, 60
+def chart(x0, y0, w, h, coeff, ys, title, subtitle, legend=True):
+    """在 (x0,y0) 起、w×h 的区域画一张图，返回SVG片段列表。"""
+    ml, mr, mt, mb = 60, 20, 48, 42
+    # 自动量程：按本组系数/输出的最大绝对值（两侧对比图各自量程，形状更清楚）
+    vmax = max([abs(v) for v in coeff] + [abs(v) for v in ys] + [0.01]) * 1.15
+    n = len(ys)
 
-def px(n):  return ML + (W - ML - MR) * n / float(N - 1)
-def py(v):
-    lo, hi = -1.05, 1.05
-    return MT + (H - MT - MB) * (hi - v) / (hi - lo)
+    def px(i): return x0 + ml + (w - ml - mr) * i / float(n - 1)
+    def py(v): return y0 + mt + (h - mt - mb) * (vmax - v) / (2 * vmax)
 
-parts = []
-parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" '
-             f'viewBox="0 0 {W} {H}">')
-parts.append(f'<rect x="0" y="0" width="{W}" height="{H}" fill="#ffffff"/>')
-parts.append('<text x="450" y="30" font-family="sans-serif" font-size="18" '
-             'text-anchor="middle" fill="#111">Q18 验收：非对称系数冲激响应'
-             '（RTL仿真 fir_core_para，82抽头）</text>')
-parts.append('<text x="450" y="50" font-family="sans-serif" font-size="12" '
-             'text-anchor="middle" fill="#555">'
-             '输入=冲激 0x7FFF；硬件输出 y[n]（红）应等于 c[n]×0x7FFF；'
-             '左右明显不对称；前82点与 golden_asym 逐位相等</text>')
+    p = []
+    p.append(f'<text x="{x0 + w/2:.0f}" y="{y0+20}" font-family="sans-serif" '
+             f'font-size="15" text-anchor="middle" fill="#111">{title}</text>')
+    p.append(f'<text x="{x0 + w/2:.0f}" y="{y0+37}" font-family="sans-serif" '
+             f'font-size="11" text-anchor="middle" fill="#555">{subtitle}</text>')
 
-# 网格与坐标轴
-lo, hi = -1.05, 1.05
-for k in range(-10, 11, 2):
-    v = k / 10.0
-    yy = py(v)
-    parts.append(f'<line x1="{ML}" y1="{yy:.1f}" x2="{W-MR}" y2="{yy:.1f}" '
-                 f'stroke="#e5e5e5" stroke-width="1"/>')
-    parts.append(f'<text x="{ML-8}" y="{yy+4:.1f}" font-family="sans-serif" '
-                 f'font-size="10" text-anchor="end" fill="#666">{v:.1f}</text>')
-zero = py(0)
-parts.append(f'<line x1="{ML}" y1="{zero:.1f}" x2="{W-MR}" y2="{zero:.1f}" '
+    for k in range(-4, 5):
+        v = vmax * k / 4.0
+        yy = py(v)
+        p.append(f'<line x1="{x0+ml}" y1="{yy:.1f}" x2="{x0+w-mr}" y2="{yy:.1f}" '
+                 f'stroke="#ececec" stroke-width="1"/>')
+        p.append(f'<text x="{x0+ml-6}" y="{yy+3:.1f}" font-family="sans-serif" '
+                 f'font-size="9" text-anchor="end" fill="#666">{v:.3f}</text>')
+    zero = py(0)
+    p.append(f'<line x1="{x0+ml}" y1="{zero:.1f}" x2="{x0+w-mr}" y2="{zero:.1f}" '
              f'stroke="#999" stroke-width="1"/>')
-for n in range(0, N, 10):
-    parts.append(f'<line x1="{px(n):.1f}" y1="{H-MB}" x2="{px(n):.1f}" '
-                 f'y2="{H-MB+5}" stroke="#666" stroke-width="1"/>')
-    parts.append(f'<text x="{px(n):.1f}" y="{H-MB+18}" font-family="sans-serif" '
-                 f'font-size="10" text-anchor="middle" fill="#666">{n}</text>')
-parts.append(f'<text x="{W/2}" y="{H-18}" font-family="sans-serif" font-size="12" '
-             f'text-anchor="middle" fill="#333">抽头序号 n</text>')
-parts.append(f'<text x="18" y="{H/2}" font-family="sans-serif" font-size="12" '
-             f'text-anchor="middle" fill="#333" '
-             f'transform="rotate(-90 18 {H/2})">幅度（Q1.15 / Q1.31 归一化）</text>')
+    for i in range(0, n, 10):
+        p.append(f'<line x1="{px(i):.1f}" y1="{y0+h-mb}" x2="{px(i):.1f}" '
+                 f'y2="{y0+h-mb+4}" stroke="#666" stroke-width="1"/>')
+        p.append(f'<text x="{px(i):.1f}" y="{y0+h-mb+16}" font-family="sans-serif" '
+                 f'font-size="9" text-anchor="middle" fill="#666">{i}</text>')
+    p.append(f'<text x="{x0+w/2:.0f}" y="{y0+h-8}" font-family="sans-serif" '
+             f'font-size="10" text-anchor="middle" fill="#333">抽头序号 n</text>')
 
-# 系数：浅蓝竖线（从0到系数值）
-for n, c in enumerate(C):
-    parts.append(f'<line x1="{px(n):.1f}" y1="{zero:.1f}" x2="{px(n):.1f}" '
+    # 系数浅蓝竖线
+    for i, c in enumerate(coeff):
+        p.append(f'<line x1="{px(i):.1f}" y1="{zero:.1f}" x2="{px(i):.1f}" '
                  f'y2="{py(c):.1f}" stroke="#9ecae1" stroke-width="3"/>')
+    # 仿真输出红线
+    pts = " ".join(f"{px(i):.1f},{py(y):.1f}" for i, y in enumerate(ys))
+    p.append(f'<polyline points="{pts}" fill="none" stroke="#d62728" stroke-width="1.5"/>')
+    for i, y in enumerate(ys):
+        p.append(f'<circle cx="{px(i):.1f}" cy="{py(y):.1f}" r="1.6" fill="#d62728"/>')
 
-# 硬件输出：红线+圆点
-pts = " ".join(f"{px(n):.1f},{py(y):.1f}" for n, y in enumerate(Y))
-parts.append(f'<polyline points="{pts}" fill="none" stroke="#d62728" stroke-width="1.6"/>')
-for n, y in enumerate(Y):
-    parts.append(f'<circle cx="{px(n):.1f}" cy="{py(y):.1f}" r="1.8" fill="#d62728"/>')
+    # y[0]/y[81]标注（数值从数据计算）
+    for i in (0, n - 1):
+        y = ys[i]
+        tx = px(i) + (8 if i == 0 else -8)
+        anchor = "start" if i == 0 else "end"
+        p.append(f'<line x1="{px(i):.1f}" y1="{py(y):.1f}" x2="{px(i):.1f}" '
+                 f'y2="{py(y)-22:.1f}" stroke="#d62728" stroke-width="1" '
+                 f'stroke-dasharray="3,2"/>')
+        p.append(f'<text x="{tx:.1f}" y="{py(y)-26:.1f}" font-family="sans-serif" '
+                 f'font-size="10" text-anchor="{anchor}" fill="#d62728">'
+                 f'y[{i}]={y:+.4f}</text>')
 
-# 标注 y[0] / y[81]
-for n, lab in ((0, "y[0]=0x16C1D27C"), (81, "y[81]=0xA633B39A")):
-    y = Y[n]
-    tx = px(n) + (10 if n == 0 else -10)
-    anchor = "start" if n == 0 else "end"
-    parts.append(f'<line x1="{px(n):.1f}" y1="{py(y):.1f}" '
-                 f'x2="{px(n):.1f}" y2="{py(y)-28:.1f}" stroke="#d62728" '
-                 f'stroke-width="1" stroke-dasharray="3,2"/>')
-    parts.append(f'<text x="{tx:.1f}" y="{py(y)-32:.1f}" font-family="sans-serif" '
-                 f'font-size="11" text-anchor="{anchor}" fill="#d62728">{lab}</text>')
+    if legend:
+        p.append(f'<line x1="{x0+w-210}" y1="{y0+mt+4}" x2="{x0+w-184}" y2="{y0+mt+4}" '
+                 f'stroke="#9ecae1" stroke-width="4"/>')
+        p.append(f'<text x="{x0+w-177}" y="{y0+mt+8}" font-family="sans-serif" '
+                 f'font-size="10" fill="#333">系数 c[n]</text>')
+        p.append(f'<line x1="{x0+w-210}" y1="{y0+mt+20}" x2="{x0+w-184}" y2="{y0+mt+20}" '
+                 f'stroke="#d62728" stroke-width="2"/>')
+        p.append(f'<text x="{x0+w-177}" y="{y0+mt+24}" font-family="sans-serif" '
+                 f'font-size="10" fill="#333">仿真输出 y[n]</text>')
+    return p
 
-# 图例
-parts.append(f'<line x1="{W-250}" y1="{MT+6}" x2="{W-220}" y2="{MT+6}" '
-             f'stroke="#9ecae1" stroke-width="4"/>')
-parts.append(f'<text x="{W-212}" y="{MT+10}" font-family="sans-serif" '
-             f'font-size="11" fill="#333">系数 c[n]（Q1.15）</text>')
-parts.append(f'<line x1="{W-250}" y1="{MT+26}" x2="{W-220}" y2="{MT+26}" '
-             f'stroke="#d62728" stroke-width="2"/>')
-parts.append(f'<text x="{W-212}" y="{MT+30}" font-family="sans-serif" '
-             f'font-size="11" fill="#333">仿真输出 y[n]</text>')
 
-parts.append("</svg>")
-os.makedirs(os.path.dirname(OUT), exist_ok=True)
-with open(OUT, "w", encoding="utf-8", newline="\n") as f:
-    f.write("\n".join(parts) + "\n")
-print("生成完成:", OUT)
-print("y[0]=%.4f y[40]=%.4f y[81]=%.4f" % (Y[0], Y[40], Y[81]))
+def write_svg(path, w, h, body):
+    svg = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{w}" height="{h}" '
+           f'viewBox="0 0 {w} {h}">',
+           f'<rect x="0" y="0" width="{w}" height="{h}" fill="#ffffff"/>']
+    svg += body
+    svg.append("</svg>")
+    os.makedirs(OUT, exist_ok=True)
+    with open(path, "w", encoding="utf-8", newline="\n") as f:
+        f.write("\n".join(svg) + "\n")
+    print("生成完成:", path)
+
+
+def main():
+    c_sym = read_coeff("coeff_q15.hex")
+    c_asym = read_coeff("coeff_asym_q15.hex")
+    y_sym = read_csv(os.path.join(SIM, "q18_impulse_sym.csv"))
+    y_asym = read_csv(os.path.join(SIM, "q18_impulse.csv"))
+
+    base = ("输入=冲激 0x7FFF；硬件输出 y[n] 应等于 c[n]×0x7FFF；"
+            "前82点与黄金模型逐位相等")
+
+    body = chart(0, 0, 900, 400, c_sym, y_sym,
+                 "对称系数冲激响应（RTL仿真 fir_core_para，82抽头）",
+                 base + "；对称：y[0]≈y[81]", legend=False)
+    write_svg(os.path.join(OUT, "q18_impulse_sym.svg"), 900, 400, body)
+
+    body = chart(0, 0, 900, 400, c_asym, y_asym,
+                 "非对称系数冲激响应（RTL仿真 fir_core_para，82抽头）",
+                 base + "；非对称：y[0]≠y[81]", legend=False)
+    write_svg(os.path.join(OUT, "q18_impulse_asym.svg"), 900, 400, body)
+
+    body = []
+    body += chart(0, 0, 900, 380, c_sym, y_sym,
+                  "对称系数（对照组）",
+                  "冲激响应左右镜像：y[0]≈y[81]")
+    body += chart(0, 380, 900, 380, c_asym, y_asym,
+                  "非对称系数（Q18证据）",
+                  "冲激响应左右明显不同：y[0]≠y[81]")
+    write_svg(os.path.join(OUT, "q18_impulse_compare.svg"), 900, 760, body)
+
+    print("sym  y[0]=%+.4f y[81]=%+.4f" % (y_sym[0], y_sym[81]))
+    print("asym y[0]=%+.4f y[81]=%+.4f" % (y_asym[0], y_asym[81]))
+
+
+if __name__ == "__main__":
+    main()

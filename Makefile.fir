@@ -107,6 +107,14 @@ sim_tb_fir_top_dual: $(OUT)
 	     $(TB_DIR)/common/tb_clkreset.v $(RTL) $(REF_RTL)
 	$(VVP) -n $(OUT)/tb_fir_top_dual.vvp
 
+# 对称系数冲激响应波形（参数化复用基础TB，产出sym版VCD/CSV）
+sim_tb_fir_para_impulse_sym: $(OUT)
+	$(IV) -g2001 -o $(OUT)/tb_fir_para_impulse_sym.vvp -s tb_fir_para_impulse_sym \
+	     $(INCPATH) $(TB_DIR)/tb_fir_para_impulse_sym.v \
+	     $(TB_DIR)/tb_fir_para_impulse.v \
+	     $(TB_DIR)/common/tb_clkreset.v $(RTL) $(REF_RTL)
+	$(VVP) -n $(OUT)/tb_fir_para_impulse_sym.vvp
+
 # 非对称固件系统级验证（复用tb_soc，固化asym固件与asym黄金）
 sim_tb_soc_asym: $(OUT)
 	$(IV) -g2001 -o $(OUT)/tb_soc_asym.vvp -s tb_soc_asym $(INCPATH) \

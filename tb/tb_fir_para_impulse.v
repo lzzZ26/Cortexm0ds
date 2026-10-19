@@ -1,10 +1,16 @@
-// tb_fir_para_impulse.v : Q18验收波形——通用并行核 + 非对称系数 + 冲激响应
-// 用途：产生可交付的仿真波形（VCD/GTKWave）与数据（CSV/SVG）。
+// tb_fir_para_impulse.v : Q18验收波形——通用并行核 + 冲激响应
+// 默认非对称系数；可用参数切对称系数（tb_fir_para_impulse_sym包装）。
 // 原理：输入首样本为冲激 0x7FFF、其后为 0；FIR 前 82 个输出即冲激响应，
-//       应逐个等于 c_asym[n]×0x7FFF（Q1.31）——左右不对称即 Q18 证据。
-// 自检：前82个输出与 golden_asym_q31.hex 前82行**逐位相等**（单乘积精确）。
+//       应逐个等于 c[n]×0x7FFF（Q1.31）——对称系数左右镜像、非对称明显不同。
+// 自检：前82个输出与 golden 前82行**逐位相等**（单乘积精确）。
 `timescale 1ns/1ps
-module tb_fir_para_impulse;
+module tb_fir_para_impulse #(
+  parameter COEFF_FILE  = "tb/data/coeff_asym_q15.hex",
+  parameter GOLDEN_FILE = "tb/data/golden_asym_q31.hex",
+  parameter VCD_FILE    = "sim_out/q18_impulse.vcd",
+  parameter CSV_FILE    = "sim_out/q18_impulse.csv",
+  parameter TAG         = "asym"
+);
   wire clk, rstn;
   reg  clr;
   reg  cfg_we; reg [9:0] cfg_addr; reg [15:0] cfg_wdata;
@@ -25,13 +31,13 @@ module tb_fir_para_impulse;
     .dout_valid(dout_valid), .dout_ready(dout_ready), .dout(dout));
 
   initial begin
-    $readmemh("tb/data/coeff_asym_q15.hex", coeff);
-    $readmemh("tb/data/golden_asym_q31.hex", golden);
+    $readmemh(COEFF_FILE, coeff);
+    $readmemh(GOLDEN_FILE, golden);
   end
 
   // VCD：只dump本TB顶层信号（clk/din/dout/valid/clr/cfg），GTKWave直接可看
   initial begin
-    $dumpfile("sim_out/q18_impulse.vcd");
+    $dumpfile(VCD_FILE);
     $dumpvars(1, tb_fir_para_impulse);
   end
 
@@ -62,7 +68,7 @@ module tb_fir_para_impulse;
     repeat (20) @(posedge clk);
 
     // 写CSV供绘图
-    fd = $fopen("sim_out/q18_impulse.csv", "w");
+    fd = $fopen(CSV_FILE, "w");
     $fdisplay(fd, "n,y_q31");
     for (n = 0; n < 82; n = n + 1)
       $fdisplay(fd, "%0d,%08X", n, cap[n]);
@@ -76,9 +82,9 @@ module tb_fir_para_impulse;
       end
     if (out_cnt != 82) $fatal(1, "FAIL: 输出数=%0d（应82）", out_cnt);
     if (err_cnt != 0) $fatal(1, "FAIL: 冲激响应与golden不符 %0d处", err_cnt);
-    $display("PASS Q18波形: 82抽头冲激响应与golden逐位相等");
+    $display("PASS Q18波形[%0s]: 82抽头冲激响应与golden逐位相等", TAG);
     $display("y[0]=%h  y[40]=%h  y[81]=%h", cap[0], cap[40], cap[81]);
-    $display("VCD=sim_out/q18_impulse.vcd  CSV=sim_out/q18_impulse.csv");
+    $display("VCD=%0s  CSV=%0s", VCD_FILE, CSV_FILE);
     $finish;
   end
 
