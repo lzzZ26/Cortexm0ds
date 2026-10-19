@@ -35,11 +35,14 @@ module tb_fir_para_impulse #(
     $readmemh(GOLDEN_FILE, golden);
   end
 
-  // VCD：只dump本TB顶层信号（clk/din/dout/valid/clr/cfg），GTKWave直接可看
-  initial begin
-    $dumpfile(VCD_FILE);
-    $dumpvars(1, tb_fir_para_impulse);
-  end
+  // VCD：在冲激开始前才启动dump，只录关键信号——避免把前面的系数配置段
+  // 和字符串参数（文件名）也录进去导致波形看起来全是0/x
+  task start_dump;
+    begin
+      $dumpfile(VCD_FILE);
+      $dumpvars(1, tb_fir_para_impulse);
+    end
+  endtask
 
   initial begin
     clr = 0; cfg_we = 0; cfg_addr = 0; cfg_wdata = 0;
@@ -56,6 +59,8 @@ module tb_fir_para_impulse #(
     // CLR（NBA，避免与核always的delta竞争）
     @(negedge clk); clr <= 1'b1;
     @(negedge clk); clr <= 1'b0;
+    // 从冲激开始前启动波形记录（前面配置段不录，GTKWave Zoom-Fit即可看到全部输出）
+    start_dump;
     // 冲激 + 81个零（82样本），negedge驱动保证posedge稳定
     for (n = 0; n < 82; n = n + 1) begin
       @(negedge clk);
