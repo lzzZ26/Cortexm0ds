@@ -10,13 +10,14 @@
 
 | 想看的 | 去哪里 |
 |---|---|
+| **整理好的验收材料（推荐外发）** | [验收材料/README.md](验收材料/README.md)（讲解文档 + 仿真 + 固件 + 参考资料） |
 | 系统结构一张图 | [§2.1 架构图](#21-系统架构图) |
 | **每个得分点对应的代码/证据** | [§5 得分点对照表](#5-得分点对照表初赛--决赛) |
-| 全部仿真图 | [§7.3 图目录](#73-图目录每张图说明什么) 或 [docs/report/figures/index.html](docs/report/figures/index.html) |
+| 全部仿真图 | [§4.3 图目录](#43-图目录每张图说明什么) 或 [docs/report/figures/index.html](docs/report/figures/index.html)（验收副本：[验收材料/仿真/图/](验收材料/仿真/图/)） |
 | **Q18 任意非对称系数证据** | [§6 Q18 专项](#6-q18-任意非对称系数专项重点) + [对比图](docs/report/figures/q18_impulse_compare.svg) |
-| 一键复现 | [§8 复现指南](#8-复现指南) |
+| 一键复现 | [§7 复现指南](#7-复现指南) |
 | 已知限制与口径说明（如实） | [§8 已知限制与待完成](#8-已知限制与待完成如实说明) |
-| 完整技术报告 | [docs/report/技术报告.md](docs/report/技术报告.md) |
+| 完整技术报告 | [docs/report/技术报告.md](docs/report/技术报告.md)（验收副本：[验收材料/讲解文档/技术报告.md](验收材料/讲解文档/技术报告.md)） |
 
 ---
 
@@ -204,8 +205,11 @@ DMA 通道 i：基址 `0x4003_0000 + 0x20*i`；`SRC 0x00 / DST 0x04 / LEN 0x08 /
 
 ### 4.3 图目录（每张图说明什么）
 
+> 现成的验收版图、波形、数据与日志已整理到 [验收材料/仿真/](验收材料/仿真/)；下表链接指向仓库源图，两处内容一致。
+
 | 图 | 说明 | 生成方式 |
 |---|---|---|
+| [verify_three_layers.svg](docs/report/figures/verify_three_layers.svg) | **三层验证总览**：单元/集成/系统各层代表 TB 与结果（17 目标 PASS） | `python tools/plot_verify_layers.py` |
 | [q18_impulse_compare.svg](docs/report/figures/q18_impulse_compare.svg) | **Q18 核心验收图**：上=对称系数冲激响应（左右镜像），下=非对称（左右不同） | `sim_tb_fir_para_impulse(_sym)` + `tools/plot_q18_impulse.py` |
 | [q18_impulse_sym.svg](docs/report/figures/q18_impulse_sym.svg) | 对称系数冲激响应：`y[0]=y[81]=0x0004FFF6` | 同上 |
 | [q18_impulse_asym.svg](docs/report/figures/q18_impulse_asym.svg) | 非对称系数冲激响应：`y[0]=0x16C1D27C`，`y[81]=0xA633B39A` | 同上 |
@@ -217,7 +221,7 @@ DMA 通道 i：基址 `0x4003_0000 + 0x20*i`；`SRC 0x00 / DST 0x04 / LEN 0x08 /
 | [seg4_noise.svg](docs/report/figures/seg4_noise.svg) | 满幅随机段：滤波前/后 | 同上 |
 | [index.html](docs/report/figures/index.html) | 图库索引（浏览器打开） | `tools/plot_waveforms.py` |
 
-**GTKWave 数字波形**（按需生成，`sim_out/` 为构建产物目录）：
+**GTKWave 数字波形**（现成文件在 [验收材料/仿真/波形/](验收材料/仿真/波形/)；重新运行会输出到 `sim_out/`）：
 ```bash
 mingw32-make -f Makefile.fir sim_tb_fir_para_impulse       # 非对称
 mingw32-make -f Makefile.fir sim_tb_fir_para_impulse_sym   # 对称
@@ -307,9 +311,9 @@ mingw32-make -f Makefile.fir sim_tb_fir_para_impulse_sym   # 对称
 | 对称系数 | `0x0004FFF6` | `0x0004FFF6` | 左右镜像 |
 | 非对称系数 | `0x16C1D27C` | `0xA633B39A` | 左右明显不同（Q18 证据） |
 
-- 图：[q18_impulse_compare.svg](docs/report/figures/q18_impulse_compare.svg)（推荐给评委）
-- 数据：`sim_out/q18_impulse.csv`（82 行）、`sim_out/q18_impulse_sym.csv`
-- 波形：`sim_out/q18_impulse.vcd`、`sim_out/q18_impulse_sym.vcd`（GTKWave）
+- 图：[q18_impulse_compare.svg](docs/report/figures/q18_impulse_compare.svg)（推荐给评委；验收副本在 [验收材料/仿真/图/](验收材料/仿真/图/)）
+- 数据：现成 CSV 在 [验收材料/仿真/数据/](验收材料/仿真/数据/)（82 行）；重新运行输出到 `sim_out/`
+- 波形：现成 VCD 在 [验收材料/仿真/波形/](验收材料/仿真/波形/)（GTKWave）；重新运行输出到 `sim_out/`
 
 ---
 
@@ -378,10 +382,13 @@ docs/ppt/      PPT 大纲 / 讲解视频脚本 / 演示视频分镜
 docs/指标记录.md  决赛四项指标与口径
 fpga/pango/    PDS 板级顶层/约束/README（CORE_TYPE 决策矩阵）
 Makefile.fir   仿真入口（17 个回归目标 + 波形目标）
+验收材料/      提交用整理版（讲解文档/仿真/固件/参考资料；见其 README）
+sim_out/       仿真构建产物（按需生成，当前已清理；有用输出已归档到 验收材料/仿真/）
 ```
 
 ### 关键文档
 
+- [验收材料索引](验收材料/README.md)（讲解文档 + 仿真 + 固件）
 - [技术报告](docs/report/技术报告.md)
 - [指标记录](docs/指标记录.md)
 - [FPGA Q18 收口计划](docs/superpowers/plans/2026-10-19-fpga-q18-handover.md)

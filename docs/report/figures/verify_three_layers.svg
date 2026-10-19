@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+<rect width="1600" height="900" fill="#ffffff"/>
+<text x="800" y="58" font-family="sans-serif" font-size="30" font-weight="bold" text-anchor="middle" fill="#111">三层验证总览：17 个回归目标全部 PASS</text>
+<text x="800" y="92" font-family="sans-serif" font-size="17" text-anchor="middle" fill="#555">单元/模块 → 集成（不含 CPU）→ 系统（含 CPU）；协议检查器零违规；误差按相对均方根 &lt;0.1%（逐样本 0.0977% 点态上界）</text>
+<rect x="40" y="170" width="480" height="560" rx="12" fill="#e8f1fb" stroke="#2f6fb3" stroke-width="2"/>
+<rect x="40" y="170" width="480" height="56" rx="12" fill="#2f6fb3"/>
+<rect x="40" y="214" width="480" height="12" fill="#2f6fb3"/>
+<text x="280.0" y="207" font-family="sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="#ffffff">① 单元 / 模块验证</text>
+<text x="68" y="270" font-family="sans-serif" font-size="17" font-weight="bold" fill="#2f6fb3">代表 TB</text>
+<text x="68" y="302" font-family="sans-serif" font-size="16" fill="#222">tb_fir_core_para / tb_fir_core_sym</text>
+<text x="68" y="332" font-family="sans-serif" font-size="16" fill="#222">tb_fir_core / tb_fir_top / tb_fir_top_dual</text>
+<text x="68" y="362" font-family="sans-serif" font-size="16" fill="#222">tb_dma_channel / tb_axi_rom / tb_decode</text>
+<text x="68" y="392" font-family="sans-serif" font-size="17" font-weight="bold" fill="#2f6fb3">关键结果</text>
+<text x="68" y="424" font-family="sans-serif" font-size="16" fill="#222">三套系数黄金回归 &lt;0.1%（对称/非对称/大系数）</text>
+<text x="68" y="454" font-family="sans-serif" font-size="16" fill="#222">吞吐 1.0 样本/拍；随机反压；中止 CLR 无污染</text>
+<text x="68" y="484" font-family="sans-serif" font-size="16" fill="#222">协议检查器零违规</text>
+<text x="68" y="514" font-family="sans-serif" font-size="17" font-weight="bold" fill="#2f6fb3">状态</text>
+<text x="68" y="546" font-family="sans-serif" font-size="16" fill="#222">PASS</text>
+<rect x="560" y="170" width="480" height="560" rx="12" fill="#e9f7ef" stroke="#2e8b57" stroke-width="2"/>
+<rect x="560" y="170" width="480" height="56" rx="12" fill="#2e8b57"/>
+<rect x="560" y="214" width="480" height="12" fill="#2e8b57"/>
+<text x="800.0" y="207" font-family="sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="#ffffff">② 集成验证（不含 CPU）</text>
+<text x="588" y="270" font-family="sans-serif" font-size="17" font-weight="bold" fill="#2e8b57">代表 TB</text>
+<text x="588" y="302" font-family="sans-serif" font-size="16" fill="#222">tb_integ / tb_arb / tb_dma_top / tb_dma_chain</text>
+<text x="588" y="332" font-family="sans-serif" font-size="16" fill="#222">VIP 替代 CPU，真实互连拓扑</text>
+<text x="588" y="362" font-family="sans-serif" font-size="17" font-weight="bold" fill="#2e8b57">关键结果</text>
+<text x="588" y="394" font-family="sans-serif" font-size="16" fill="#222">SRAM 16 拍 INCR 往返</text>
+<text x="588" y="424" font-family="sans-serif" font-size="16" fill="#222">82 系数配置 + 1024 样本滤波</text>
+<text x="588" y="454" font-family="sans-serif" font-size="16" fill="#222">对称 + 非对称两轮黄金比对 &lt;0.1%</text>
+<text x="588" y="484" font-family="sans-serif" font-size="16" fill="#222">DMA 单拍搬运；协议零违规</text>
+<text x="588" y="514" font-family="sans-serif" font-size="17" font-weight="bold" fill="#2e8b57">状态</text>
+<text x="588" y="546" font-family="sans-serif" font-size="16" fill="#222">PASS</text>
+<rect x="1080" y="170" width="480" height="560" rx="12" fill="#fdf2e3" stroke="#c47b1a" stroke-width="2"/>
+<rect x="1080" y="170" width="480" height="56" rx="12" fill="#c47b1a"/>
+<rect x="1080" y="214" width="480" height="12" fill="#c47b1a"/>
+<text x="1320.0" y="207" font-family="sans-serif" font-size="22" font-weight="bold" text-anchor="middle" fill="#ffffff">③ 系统测试（含 CPU）</text>
+<text x="1108" y="270" font-family="sans-serif" font-size="17" font-weight="bold" fill="#c47b1a">代表 TB</text>
+<text x="1108" y="302" font-family="sans-serif" font-size="16" fill="#222">tb_soc / tb_soc_asym / tb_soc_smoke</text>
+<text x="1108" y="332" font-family="sans-serif" font-size="16" fill="#222">tb_soc_smoke_rom（FPGA ROM 路径）</text>
+<text x="1108" y="362" font-family="sans-serif" font-size="17" font-weight="bold" fill="#c47b1a">关键结果</text>
+<text x="1108" y="394" font-family="sans-serif" font-size="16" fill="#222">UART 回显 64 字符</text>
+<text x="1108" y="424" font-family="sans-serif" font-size="16" fill="#222">6 通道 DMA 自检；软硬协同</text>
+<text x="1108" y="454" font-family="sans-serif" font-size="16" fill="#222">CPU 配系数 + DMA 搬运 + 读回比对</text>
+<text x="1108" y="484" font-family="sans-serif" font-size="16" fill="#222">1024 样本黄金 &lt;0.1%；四标记齐全</text>
+<text x="1108" y="514" font-family="sans-serif" font-size="17" font-weight="bold" fill="#c47b1a">状态</text>
+<text x="1108" y="546" font-family="sans-serif" font-size="16" fill="#222">PASS</text>
+<rect x="40" y="770" width="1520" height="110" rx="10" fill="#f5f5f5" stroke="#bbb"/>
+<text x="70" y="804" font-family="sans-serif" font-size="19" font-weight="bold" fill="#111">Q18（赛题答疑第 18 条）可视化证据</text>
+<text x="70" y="836" font-family="sans-serif" font-size="16" fill="#222">对称系数：y[0] = y[81] = 0x0004FFF6（左右镜像）　|　非对称系数：y[0] = 0x16C1D27C，y[81] = 0xA633B39A（左右明显不同）</text>
+<text x="70" y="864" font-family="sans-serif" font-size="15" fill="#555">对应图：docs/report/figures/q18_impulse_compare.svg（冲激响应，82 个抽头）</text>
+</svg>

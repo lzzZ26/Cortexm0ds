@@ -1,0 +1,230 @@
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_vip_smoke
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_vip_smoke.vvp -s tb_vip_smoke -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_vip_smoke.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_vip_smoke.vvp
+PASS: VIP自测通过（写读往返+协议零违规）
+tb/tb_vip_smoke.v:63: $finish called at 2470000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_arb
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_arb.vvp -s tb_arb -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_arb.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_arb.vvp
+主0完成
+PASS: 双主并发压力测试通过（零协议违规、无死锁、轮询公平）
+tb/tb_arb.v:129: $finish called at 31010000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_decode
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_decode.vvp -s tb_decode -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_decode.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_decode.vvp
+PASS: 地址译码全覆盖（每块恰好一个从机）
+tb/tb_decode.v:67: $finish called at 65561000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_fir_core
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_fir_core.vvp -s tb_fir_core -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_fir_core.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_fir_core.vvp
+PASS: 1024样本误差全部<0.1% + 饱和用例正确
+tb/tb_fir_core.v:94: $finish called at 1884870000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_fir_top
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_fir_top.vvp -s tb_fir_top -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_fir_top.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_fir_top.vvp
+WARNING: tb/tb_fir_top.v:51: $readmemh(tb/data/golden_q31.hex): Too many words in the file for the requested range [0:71].
+PASS: FIR从机（系数INCR/数据单拍+FIXED突发/字节半字访问）
+tb/tb_fir_top.v:140: $finish called at 131350000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_fir_core_sym
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_fir_core_sym.vvp -s tb_fir_core_sym -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_fir_core_sym.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_fir_core_sym.vvp
+PASS: 对称并行FIR黄金回归+吞吐=1样本/拍
+PASS: 对称并行FIR随机反压（stall 366拍，接受拍记分板全对）
+tb/tb_fir_core_sym.v:111: $finish called at 53190000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_fir_core_para
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_fir_core_para.vvp -s tb_fir_core_para -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_fir_core_para.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_fir_core_para.vvp
+PASS A: 对称系数黄金回归<0.1%
+PASS B: 非对称随机系数黄金回归<0.1%
+PASS C: 大系数黄金回归<0.1%（饱和钳位 369 处）
+PASS D: 吞吐=1样本/拍
+PASS E: 中途CLR无污染
+PASS F1: 全零系数输出全零
+PASS F2: cfg_addr索引正确（c[7]冲激响应=0x3FFF8000）
+PASS F3: 覆盖写回归（干扰值→真值全部落位）
+PASS G: 随机输出反压下降（stall 369 拍，接受拍记分板全对）
+PASS: 通用并行FIR全用例（对称+非对称+大系数+吞吐+CLR+cfg+反压）
+tb/tb_fir_core_para.v:298: $finish called at 193850000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_fir_top_dual
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_fir_top_dual.vvp -s tb_fir_top \
+     -Ptb_fir_top.CORE_TYPE=3 -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_fir_top.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_fir_top_dual.vvp
+WARNING: tb/tb_fir_top.v:51: $readmemh(tb/data/golden_q31.hex): Too many words in the file for the requested range [0:71].
+PASS ①: 默认para模式非对称系数黄金回归
+PASS ②: CLR切换sym模式黄金回归（切换清核，无脏历史）
+PASS ③: CLR切回para再验（切换无污染）
+PASS ④: 大系数饱和回归（钳位 369 处）
+PASS ⑤a: para模式 y[81]=0（c[0]仅作用于x[n]）
+PASS ⑤b: sym模式 y[81]=c[0]×x[0]（证明sym核被选中）
+PASS: FIR从机双核模式（para默认+sym可选+CLR切换+非对称+饱和+模式判别）
+tb/tb_fir_top.v:280: $finish called at 895230000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_dma_channel
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_dma_channel.vvp -s tb_dma_channel -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_dma_channel.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_dma_channel.vvp
+PASS: 单通道DMA（7类用例零差错+协议零违规）
+tb/tb_dma_channel.v:179: $finish called at 209030000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_dma_top
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_dma_top.vvp -s tb_dma_top -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_dma_top.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_dma_top.vvp
+全部通道完成，周期=65
+PASS: 6通道并发独立工作零差错+中断状态正确
+tb/tb_dma_top.v:217: $finish called at 73050000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_dma_chain
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_dma_chain.vvp -s tb_dma_chain -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_dma_chain.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_dma_chain.vvp
+PASS: 3段链表自动串联执行（无CPU干预，末段中断）
+tb/tb_dma_chain.v:198: $finish called at 25490000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_soc_smoke
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_soc_smoke.vvp -s tb_soc_smoke -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_soc_smoke.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_soc_smoke.vvp
+PASS: SoC冒烟——CPU启动、UART2输出Hello world
+tb/tb_soc_smoke.v:78: $finish called at 373650000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_soc
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_soc.vvp -s tb_soc -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_soc.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_soc.vvp
+LINE: 
+LINE: FIR-SoC Demo
+回显64字符全部正确
+LINE: ** ECHO PASS **
+LINE: ** DMA PASS **
+LINE: out=20000468
+LINE: ** FIR DONE **
+FIR黄金比对：1024样本全部<0.1%（严格阈值0.0977%）
+===== 指标（50MHz仿真）=====
+DIN样本=1024 DOUT样本=1024
+FIR吞吐量 = 0.0363 samples/cycle
+系统延迟(首DIN→首DOUT) = 3.04 us
+DMA带宽(FIR阶段4KB进+4KB出) = 14.44 MB/s
+===== 指标结束 =====
+PASS: 固件回显+DMA自检+FIR软硬协同全部通过
+tb/tb_soc.v:195: $finish called at 3323230000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_soc_asym
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_soc_asym.vvp -s tb_soc_asym -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ \
+     tb/tb_soc_asym.v tb/tb_soc.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_soc_asym.vvp
+LINE: 
+LINE: FIR-SoC Demo
+回显64字符全部正确
+LINE: ** ECHO PASS **
+LINE: ** DMA PASS **
+LINE: ** FIR ASYM MODE **
+LINE: out=20000468
+LINE: ** FIR DONE **
+FIR黄金比对：1024样本全部<0.1%（严格阈值0.0977%）
+===== 指标（50MHz仿真）=====
+DIN样本=1024 DOUT样本=1024
+FIR吞吐量 = 0.0363 samples/cycle
+系统延迟(首DIN→首DOUT) = 3.04 us
+DMA带宽(FIR阶段4KB进+4KB出) = 14.44 MB/s
+===== 指标结束 =====
+PASS: 固件回显+DMA自检+FIR软硬协同全部通过
+tb/tb_soc.v:195: $finish called at 3344890000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_axi_rom
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_axi_rom.vvp -s tb_axi_rom -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_axi_rom.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_axi_rom.vvp
+PASS: axi_rom自检通过（字/窄读通道/INCR/FIXED突发/协议零违规）
+tb/tb_axi_rom.v:90: $finish called at 3050000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_soc_smoke_rom
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_soc_smoke_rom.vvp -s tb_soc_smoke \
+     -Ptb_soc_smoke.MEM_IMPL=1 -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_soc_smoke.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_soc_smoke_rom.vvp
+PASS: SoC冒烟——CPU启动、UART2输出Hello world
+tb/tb_soc_smoke.v:78: $finish called at 454030000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
+D:/Program Files/mingw64/bin/mingw32-make -f Makefile.fir sim_tb_integ
+mingw32-make[1]: Entering directory 'D:/ICT/Cortexm0ds'
+iverilog -g2001 -o sim_out/tb_integ.vvp -s tb_integ -Itb/common -I./core/cortexm0ds/ -I./core/cortexm0_integration/ -I./core/cortexm0_dap/ -I./core/models/ -I./mcu_system/cmsdk_axi_to_apb/ -I./mcu_system/cmsdk_axi_memory/ -I./mcu_system/cmsdk_apb_dualtimers/ -I./mcu_system/cmsdk_apb_watchdog/ -I./mcu_system/cmsdk_axi_slave_mux/ tb/tb_integ.v \
+     tb/common/axi_master_vip.v tb/common/axi_slave_mem.v \
+     tb/common/axi_checker.v tb/common/uart_bfm.v \
+     tb/common/tb_clkreset.v rtl/ic/ic_axi_master_arb.v rtl/ic/ic_axi_addr_decode.v rtl/ic/ic_axi_slave_mux.v rtl/fir/fir_core.v rtl/fir/fir_top.v rtl/fir/fir_core_sym.v rtl/fir/fir_core_para.v rtl/dma/dma_channel.v rtl/dma/dma_top.v rtl/soc/soc_top.v rtl/soc/axi_sram_sim.v rtl/fpga/axi_rom.v ./core/cortexm0_dap/cortexm0dap.v ./core/cortexm0_integration/cortexm0_wic.v ./core/cortexm0_integration/cortexm0_systick.v ./core/cortexm0_integration/cortexm0integration.v ./core/cortexm0ds/ahb2axi4_if.v ./core/cortexm0ds/ahb2axi4_ahb.v ./core/cortexm0ds/ahb2axi4_axi.v ./core/cortexm0ds/ahb2axi4_burst.v ./core/cortexm0ds/ahb2axi4_fifo.v ./core/cortexm0ds/cortexm0ds.v ./core/cortexm0ds/cortexm0ds_logic.v ./core/models/cm0_dbg_reset_sync.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_gpio.v ./mcu_system/cmsdk_axi_gpio/cmsdk_axi_to_iop.v ./mcu_system/cmsdk_axi_gpio/cmsdk_iop_gpio.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_flash.v ./mcu_system/cmsdk_axi_memory/cmsdk_axi_ram_beh.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_axi2apb_subsystem.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_apb_test_slave.v ./mcu_system/cmsdk_axi2apb_subsystem/cmsdk_irq_sync.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_if.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_axi.v ./mcu_system/cmsdk_axi_to_apb/axi2apb_apb.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers.v ./mcu_system/cmsdk_apb_dualtimers/cmsdk_apb_dualtimers_frc.v ./mcu_system/cmsdk_apb_slave_mux/cmsdk_apb_slave_mux.v ./mcu_system/cmsdk_apb_timer/cmsdk_apb_timer.v ./mcu_system/cmsdk_apb_uart/cmsdk_apb_uart.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog.v ./mcu_system/cmsdk_apb_watchdog/cmsdk_apb_watchdog_frc.v ./mcu_system/cmsdk_mcu_system/cmsdk_axi_default_slave.v
+vvp -n sim_out/tb_integ.vvp
+集成-SRAM往返16拍INCR正确
+集成-82系数配置完成
+集成-1024输入样本入SRAM完成
+集成-DMA搬运完成（ch0=00000002 ch1=00000002）
+集成-对称系数黄金比对通过
+集成-非对称82系数配置完成
+集成-非对称DMA搬运完成（ch2=00000002 ch3=00000002）
+集成-非对称系数系统级黄金比对<0.1%通过
+PASS: 集成验证（无CPU）——SRAM往返+82系数配置+1024样本FIR滤波黄金比对<0.1%+协议零违规
+tb/tb_integ.v:415: $finish called at 1283770000 (1ps)
+mingw32-make[1]: Leaving directory 'D:/ICT/Cortexm0ds'
