@@ -22,7 +22,7 @@ module tb_fir_para_impulse #(
   integer n, out_cnt, err_cnt, fd;
   reg [31:0] cap [0:127];
 
-  tb_clkreset #() u_ck (.clk(clk), .rstn(rstn));
+  tb_clkreset #(.RESET_CYCLES(5)) u_ck (.clk(clk), .rstn(rstn));
 
   fir_core_para #(.TAPS(82), .CW(16), .DW(16)) u_fir (
     .ACLK(clk), .ARESETn(rstn), .clr(clr),
@@ -42,31 +42,25 @@ module tb_fir_para_impulse #(
     .din_valid(din_valid), .din_ready(din_ready), .din(din),
     .dout_valid(dout_valid), .dout_ready(dout_ready), .dout(dout));
 
-  // VCD：在冲激开始前才启动dump——避免把前面的系数配置段也录进去
-  task start_dump;
-    begin
-      $dumpfile(VCD_FILE);
-      $dumpvars(0, tb_fir_para_impulse.u_probe);
-    end
-  endtask
+  // VCD从时间0开始录（probe只含关键信号）——波形总长约2us，Zoom-Fit即全部
+  initial begin
+    $dumpfile(VCD_FILE);
+    $dumpvars(0, tb_fir_para_impulse.u_probe);
+  end
 
   initial begin
     clr = 0; cfg_we = 0; cfg_addr = 0; cfg_wdata = 0;
     din_valid = 0; din = 0; dout_ready = 1;
     out_cnt = 0; err_cnt = 0;
     wait (rstn == 1'b1);
-    // 配置82个非对称系数（每项2沿保持，NBA脉冲）
-    for (n = 0; n < 82; n = n + 1) begin
-      @(negedge clk);
-      cfg_we = 1; cfg_addr = n[9:0]; cfg_wdata = coeff[n];
-      @(negedge clk);
-      cfg_we = 0;
-    end
+    @(posedge clk);   // 越过复位释放沿，避免与核always的复位分支竞争
+    // 波形用例专用：直接初始化核内系数寄存器，省去82项配置段（约3.3us），
+    // 使VCD从复位后立即进入冲激响应。系数配置接口的功能验证见
+    // tb_fir_core_para 用例F（cfg逐系数写/覆盖写回归）。
+    for (n = 0; n < 82; n = n + 1) u_fir.c[n] = coeff[n];
     // CLR（NBA，避免与核always的delta竞争）
     @(negedge clk); clr <= 1'b1;
     @(negedge clk); clr <= 1'b0;
-    // 从冲激开始前启动波形记录（前面配置段不录，GTKWave Zoom-Fit即可看到全部输出）
-    start_dump;
     // 冲激 + 81个零（82样本），negedge驱动保证posedge稳定
     for (n = 0; n < 82; n = n + 1) begin
       @(negedge clk);
