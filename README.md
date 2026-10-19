@@ -110,9 +110,9 @@ SRAM 输出结果 ◄──DMA ch1（FIXED_SRC，单拍）── FIR DOUT FIFO
 | 模块 | 文件 | 归属 | 职责 |
 |---|---|---|---|
 | 多主仲裁器 | [rtl/ic/ic_axi_master_arb.v](rtl/ic/ic_axi_master_arb.v) | 自研 | CPU/DMA 双主轮询，读/写独立授权，单事务在途 |
-| 从机复用器 | [rtl/ic/ic_axi_slave_mux.v](rtl/ic/ic_axi_slave_mux.v) | 自研 | 握手入队/响应出队的路由队列，解决多主并发路由刷新 |
+| 从机复用器 | [rtl/ic/ic_axi_slave_mux.v](rtl/ic/ic_axi_slave_mux.v) | 自研 | 握手入队/响应出队的路由队列，面向多主并发增强路由 |
 | 地址译码 | [rtl/ic/ic_axi_addr_decode.v](rtl/ic/ic_axi_addr_decode.v) | 自研 | 官方地图 + FIR/DMA 区域 |
-| SRAM 模型 | [rtl/soc/axi_sram_sim.v](rtl/soc/axi_sram_sim.v) | 自研 | 无读写互斥缺陷的 SRAM 模型 |
+| SRAM 模型 | [rtl/soc/axi_sram_sim.v](rtl/soc/axi_sram_sim.v) | 自研 | 面向多主并发的 SRAM 模型（避免读写重叠丢写） |
 | **FIR 通用并行核** | [rtl/fir/fir_core_para.v](rtl/fir/fir_core_para.v) | 自研 | **82 独立系数 × 82 乘法器，任意非对称系数，1 sample/cycle（Q18 主路径）** |
 | FIR 对称核 | [rtl/fir/fir_core_sym.v](rtl/fir/fir_core_sym.v) | 自研 | 41 预加 + 41 乘法，对称系数可选优化分支 |
 | FIR 串行核 | [rtl/fir/fir_core.v](rtl/fir/fir_core.v) | 自研 | 1 MAC 时间复用，82 拍/样本（资源下限） |
@@ -158,7 +158,7 @@ DMA 通道 i：基址 `0x4003_0000 + 0x20*i`；`SRC 0x00 / DST 0x04 / LEN 0x08 /
 1. **任意非对称系数 FIR（Q18）**：`fir_core_para` 82 个独立系数寄存器 + 82 个 16×16 乘法器 + 7 级加法树；`cfg_addr` 0..81 全有效；输出 Q1.31、饱和判据 `acc[39:30]` 符号扩展。
 2. **对称优化分支**：`fir_core_sym` 预加对 + 41 乘法；CTRL bit1 在 CLR 拍锁存，切换必然全清双核（模式锁存 + CLR 语义）。
 3. **DMA 链式传输**：`dma_channel` 完成后从 NEXT 指针读 5 字描述符自动续传，无需 CPU 干预（创新点，`tb_dma_chain` 验证）。
-4. **多主互连**：自研仲裁器单事务在途 + 授权保持；自研从机 mux 用队列路由响应，解决官方 mux 在多主并发下的路由刷新缺陷（实测）。
+4. **多主互连**：自研仲裁器单事务在途 + 授权保持；自研从机 mux 用队列路由响应，面向多主并发增强官方基础 mux 的路由（实测）。
 5. **软硬协同**：`fir_demo.c` 完成 UART 横幅/回显、6 通道 DMA 自检、CPU 配系数、DMA 搬运、结果回读；误差校验在 TB 侧完成（避免 M0 长循环取指异常）。
 6. **无厂商 IP/原语**：板级 50MHz 直连（无 PLL）；ROM 初始化备选为纯 RTL case-ROM（`tools/gen_rom_rtl.py`）。
 
