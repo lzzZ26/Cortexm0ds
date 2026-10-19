@@ -12,13 +12,13 @@
 
 ```
 rtl/           本项目RTL（ic仲裁/mux/译码、fir三模块、dma两模块、soc顶层、fpga ROM）
-tb/            本项目12个自检TB + common基础设施（VIP/检查器/存储从机/BFM/时钟复位）
+tb/            本项目17个回归目标（含参数化目标）+ common基础设施（VIP/检查器/存储从机/BFM/时钟复位）
 sw/firmware/fir_demo/  演示固件（C源码+makefile，复用官方CMSIS编译）
 tools/         黄金模型生成器 + 打包脚本
 fpga/          PDS板级顶层/约束/README
 docs/          Spec/计划/走读笔记/指标记录/技术报告底稿/PPT与视频素材
                （团队过程文档superpowers/不打包）
-Makefile.fir   仿真入口（13个make目标）
+Makefile.fir   仿真入口（17个回归目标 + Q18波形目标）
 官方工程获取.txt  官方DesignStart工程下载指引（不随包分发，按许可）
 ```
 
@@ -29,17 +29,18 @@ Makefile.fir   仿真入口（13个make目标）
 从ARM官网下载Cortex-M0 DesignStart r1p0后与包内文件同目录放置。
 
 ### 编译运行方法
-- 仿真（全量回归）：`mingw32-make -f Makefile.fir sim_tb_vip_smoke sim_tb_arb
-  sim_tb_decode sim_tb_fir_core sim_tb_fir_top sim_tb_fir_core_sym
-  sim_tb_dma_channel sim_tb_dma_top sim_tb_dma_chain sim_tb_soc_smoke
-  sim_tb_soc sim_tb_axi_rom sim_tb_soc_smoke_rom`
-- 固件重建：`cd sw/firmware/fir_demo && mingw32-make all`（生成fir_demo.hex）
+- 仿真（全量回归17个目标）：`mingw32-make -f Makefile.fir regression`
+- Q18 验收波形：`mingw32-make -f Makefile.fir sim_tb_fir_para_impulse`
+  （非对称）/ `sim_tb_fir_para_impulse_sym`（对称），再跑
+  `python tools/plot_q18_impulse.py` 生成对比图
+- 固件重建：`cd sw/firmware/fir_demo && mingw32-make all`（对称 `fir_demo.hex`）；
+  `mingw32-make asym`（非对称 `fir_demo_asym.hex`）
 - 黄金模型：`python tools/gen_fir_golden.py`
 
 ### 仿真复现步骤
 1. 装齐工具链（版本见下）
 2. 官方工程与本项目同目录（仓库根）
-3. 跑全量回归，13个TB全部输出PASS
+3. 跑全量回归，17个目标全部输出PASS
 
 ### 版本与工具链记录
 - iverilog 12.0 / vvp / mingw32-make 4.2.1 / arm-none-eabi-gcc
